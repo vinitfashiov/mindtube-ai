@@ -161,9 +161,9 @@ button {
   .hero-scroll-container {
     display: flex !important;
     flex-direction: column !important;
-    justify-content: flex-end !important;
-    padding-top: 28vh !important;
-    padding-bottom: 12px !important;
+    justify-content: center !important;
+    padding-top: 40px !important;
+    padding-bottom: 32px !important;
   }
 
   .agent-header {
