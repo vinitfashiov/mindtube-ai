@@ -10,7 +10,7 @@ import {
   GitFork,
   BookOpen
 } from 'lucide-react';
-import { VideoNoteAnalysis, MindMapNode } from '../types/notes';
+import { VideoNoteAnalysis, RevisemapTreeNode } from '../types/notes';
 
 interface TreeNotesPdfViewProps {
   analysis: VideoNoteAnalysis;
@@ -18,31 +18,34 @@ interface TreeNotesPdfViewProps {
   onSwitchStyle?: (style: 'handbook' | 'tree') => void;
 }
 
-// Recursive component to render tree nodes matching exact Revisemap styling
-const RenderTreeNode: React.FC<{ node: MindMapNode; depth?: number }> = ({ node, depth = 0 }) => {
-  if (!node) return null;
+// Render individual tree node matching exact Revisemap badge hierarchy
+const RenderTreeNode: React.FC<{ node: RevisemapTreeNode; depth?: number }> = ({ node, depth = 0 }) => {
+  if (!node || !node.title) return null;
 
-  // Level 0: Main Topic Box (Dark Olive Green / Gold border)
-  if (depth === 0) {
+  const badgeType = node.badgeType || (depth === 0 ? 'topic' : depth === 1 ? 'section_purple' : depth === 2 ? 'badge_green' : depth === 3 ? 'badge_brown' : depth === 4 ? 'subtopic_blue' : 'item');
+
+  // Level 0: Main Subject Box (Dark Olive / Gold Border)
+  if (badgeType === 'topic' || depth === 0) {
     return (
-      <div style={{ marginBottom: 14 }}>
+      <div style={{ marginBottom: 10 }}>
         <div style={{
           background: '#423828',
           color: '#ffffff',
           border: '2px solid #a3e635',
-          padding: '6px 12px',
-          fontSize: 14,
+          padding: '4px 10px',
+          fontSize: 13,
           fontWeight: 800,
-          borderRadius: 4,
+          borderRadius: 3,
           display: 'inline-block',
-          marginBottom: 6
+          marginBottom: 4,
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
         }}>
-          {node.label} {node.details ? `(${node.details})` : ''}
+          {node.title} {node.details ? `(${node.details})` : ''}
         </div>
         {node.children && node.children.length > 0 && (
-          <div style={{ paddingLeft: 6, borderLeft: '2px solid #0284c7', marginLeft: 6 }}>
-            {node.children.map((child) => (
-              <RenderTreeNode key={child.id || child.label} node={child} depth={depth + 1} />
+          <div style={{ paddingLeft: 6, borderLeft: '1.5px solid #0284c7', marginLeft: 6, display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {node.children.map((child, cIdx) => (
+              <RenderTreeNode key={cIdx} node={child} depth={depth + 1} />
             ))}
           </div>
         )}
@@ -50,33 +53,32 @@ const RenderTreeNode: React.FC<{ node: MindMapNode; depth?: number }> = ({ node,
     );
   }
 
-  // Level 1: Sub-category Header (Green / Blue / Purple badges)
-  if (depth === 1) {
-    const isSpecialCategory = node.label.includes('विशेषताएं') || node.label.includes('परिभाषा') || node.label.includes('महत्व') || node.label.includes('प्रकार');
+  // Level 1: Purple Section Box (e.g. नर जनन तंत्र, मादा जनन तंत्र)
+  if (badgeType === 'section_purple') {
     return (
-      <div style={{ marginTop: 8, marginBottom: 6 }}>
+      <div style={{ marginTop: 6, marginBottom: 4 }}>
         <div style={{
-          background: isSpecialCategory ? '#15803d' : '#1e1b4b',
+          background: '#4c1d95',
           color: '#ffffff',
-          border: isSpecialCategory ? '1.5px solid #4ade80' : '1.5px solid #38bdf8',
-          padding: '4px 10px',
-          fontSize: 12.5,
+          border: '1.5px solid #38bdf8',
+          padding: '3px 8px',
+          fontSize: 12,
           fontWeight: 800,
-          borderRadius: 4,
+          borderRadius: 3,
           display: 'inline-block',
-          marginBottom: 4
+          marginBottom: 3
         }}>
-          {node.label}
+          {node.title}
         </div>
         {node.details && (
-          <div style={{ fontSize: 11.5, color: '#0369a1', paddingLeft: 8, marginBottom: 2 }}>
+          <div style={{ fontSize: 11, color: '#0369a1', paddingLeft: 6, marginBottom: 2 }}>
             |_ {node.details}
           </div>
         )}
         {node.children && node.children.length > 0 && (
-          <div style={{ paddingLeft: 8, borderLeft: '2px solid #0284c7', marginLeft: 6 }}>
-            {node.children.map((child) => (
-              <RenderTreeNode key={child.id || child.label} node={child} depth={depth + 1} />
+          <div style={{ paddingLeft: 6, borderLeft: '1.5px solid #0284c7', marginLeft: 6, display: 'flex', flexDirection: 'column', gap: 3 }}>
+            {node.children.map((child, cIdx) => (
+              <RenderTreeNode key={cIdx} node={child} depth={depth + 1} />
             ))}
           </div>
         )}
@@ -84,20 +86,109 @@ const RenderTreeNode: React.FC<{ node: MindMapNode; depth?: number }> = ({ node,
     );
   }
 
-  // Level 2 & deeper: Leaf nodes with exact |_ branch prefix
+  // Level 2: Green Category Badge (e.g. विशेषताएं, विधियाँ, मासिक चक्र)
+  if (badgeType === 'badge_green') {
+    return (
+      <div style={{ marginTop: 4, marginBottom: 3 }}>
+        <div style={{
+          background: '#15803d',
+          color: '#ffffff',
+          border: '1.5px solid #4ade80',
+          padding: '2px 7px',
+          fontSize: 11.5,
+          fontWeight: 800,
+          borderRadius: 3,
+          display: 'inline-block',
+          marginBottom: 2
+        }}>
+          {node.title}
+        </div>
+        {node.details && (
+          <div style={{ fontSize: 11, color: '#166534', paddingLeft: 6 }}>
+            |_ {node.details}
+          </div>
+        )}
+        {node.children && node.children.length > 0 && (
+          <div style={{ paddingLeft: 6, borderLeft: '1.5px solid #0284c7', marginLeft: 6, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {node.children.map((child, cIdx) => (
+              <RenderTreeNode key={cIdx} node={child} depth={depth + 1} />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Level 3: Dark Brown/Yellow Pill Badge (e.g. किन में होता है, कार्य, स्थिति)
+  if (badgeType === 'badge_brown') {
+    return (
+      <div style={{ marginTop: 3, marginBottom: 2 }}>
+        <div style={{
+          background: '#713f12',
+          color: '#fef08a',
+          border: '1px solid #fde047',
+          padding: '2px 6px',
+          fontSize: 11,
+          fontWeight: 700,
+          borderRadius: 3,
+          display: 'inline-block',
+          marginBottom: 2
+        }}>
+          {node.title}
+        </div>
+        {node.details && (
+          <div style={{ fontSize: 11, color: '#854d0e', paddingLeft: 6 }}>
+            |_ {node.details}
+          </div>
+        )}
+        {node.children && node.children.length > 0 && (
+          <div style={{ paddingLeft: 6, borderLeft: '1.5px solid #0284c7', marginLeft: 6, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {node.children.map((child, cIdx) => (
+              <RenderTreeNode key={cIdx} node={child} depth={depth + 1} />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Level 4: Blue Subtopic Title (e.g. द्विखंडन, बहुविखंडन, मुकुलन)
+  if (badgeType === 'subtopic_blue') {
+    return (
+      <div style={{ marginTop: 3, marginBottom: 2 }}>
+        <div style={{ fontSize: 11.5, fontWeight: 800, color: '#1d4ed8' }}>
+          {node.title}
+        </div>
+        {node.details && (
+          <div style={{ fontSize: 11, color: '#1e293b', paddingLeft: 4 }}>
+            |_ {node.details}
+          </div>
+        )}
+        {node.children && node.children.length > 0 && (
+          <div style={{ paddingLeft: 6, borderLeft: '1.5px solid #0284c7', marginLeft: 6, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {node.children.map((child, cIdx) => (
+              <RenderTreeNode key={cIdx} node={child} depth={depth + 1} />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Level 5: Standard Branch Leaf Item (|__ Item text)
   return (
-    <div style={{ fontSize: 11.5, color: '#1e293b', lineHeight: 1.5, marginTop: 3 }}>
+    <div style={{ fontSize: 11, color: '#1e293b', lineHeight: 1.45, marginTop: 2 }}>
       <div style={{ display: 'flex', gap: 4, alignItems: 'flex-start' }}>
         <span style={{ color: '#0284c7', fontWeight: 'bold', fontFamily: 'monospace', flexShrink: 0 }}>|_</span>
         <div>
-          <strong style={{ color: node.children && node.children.length > 0 ? '#1d4ed8' : '#0f172a' }}>{node.label}</strong>
+          <span>{node.title}</span>
           {node.details && <span style={{ color: '#475569', marginLeft: 4 }}>— {node.details}</span>}
         </div>
       </div>
       {node.children && node.children.length > 0 && (
-        <div style={{ paddingLeft: 12, borderLeft: '1.5px solid #cbd5e1', marginLeft: 6, marginTop: 2 }}>
-          {node.children.map((child) => (
-            <RenderTreeNode key={child.id || child.label} node={child} depth={depth + 1} />
+        <div style={{ paddingLeft: 8, borderLeft: '1px solid #cbd5e1', marginLeft: 4, marginTop: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {node.children.map((child, cIdx) => (
+            <RenderTreeNode key={cIdx} node={child} depth={depth + 1} />
           ))}
         </div>
       )}
@@ -117,18 +208,12 @@ export const TreeNotesPdfView: React.FC<TreeNotesPdfViewProps> = ({
 
   const handleCopyText = () => {
     let text = `${analysis.videoTitle}\n${analysis.videoUrl}\n\n`;
-    if (analysis.mindmap?.children) {
-      analysis.mindmap.children.forEach((branch) => {
-        text += `=== ${branch.label} ===\n`;
-        if (branch.details) text += `${branch.details}\n`;
-        if (branch.children) {
-          branch.children.forEach((sub) => {
-            text += `  |_ ${sub.label}\n`;
-            if (sub.details) text += `     ${sub.details}\n`;
-          });
-        }
-        text += '\n';
-      });
+    if (analysis.revisemapTree && analysis.revisemapTree.length > 0) {
+      const dumpNode = (n: RevisemapTreeNode, indent = 0) => {
+        text += `${'  '.repeat(indent)}|_ ${n.title} ${n.details ? `(${n.details})` : ''}\n`;
+        if (n.children) n.children.forEach((c) => dumpNode(c, indent + 1));
+      };
+      analysis.revisemapTree.forEach((t) => dumpNode(t));
     }
     navigator.clipboard.writeText(text);
     setIsCopied(true);
@@ -145,7 +230,7 @@ export const TreeNotesPdfView: React.FC<TreeNotesPdfViewProps> = ({
       const filename = `MindTube_Tree_${analysis.videoTitle.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 40)}.pdf`;
 
       const opt = {
-        margin: [6, 6, 6, 6] as [number, number, number, number],
+        margin: [4, 4, 4, 4] as [number, number, number, number],
         filename,
         image: { type: 'jpeg' as const, quality: 0.98 },
         html2canvas: { scale: 2, useCORS: true, logging: false },
@@ -162,24 +247,106 @@ export const TreeNotesPdfView: React.FC<TreeNotesPdfViewProps> = ({
     }
   };
 
-  // Extract mindmap tree branches
-  const mindmapRoot = analysis.mindmap || { id: 'root', label: analysis.videoTitle, children: [] };
-  const mindmapBranches = mindmapRoot.children || [];
-  
-  // Also split chapters into tree branches if mindmap is empty
-  const chapters = analysis.outline || [];
+  // Build Exhaustive Tree if revisemapTree is not present
+  const treeNodes: RevisemapTreeNode[] = React.useMemo(() => {
+    if (analysis.revisemapTree && analysis.revisemapTree.length > 0) {
+      return analysis.revisemapTree;
+    }
 
-  // Group branches across 3 columns
-  const totalBranches = mindmapBranches.length > 0 ? mindmapBranches : chapters.map((c) => ({
-    id: c.id,
-    label: c.title,
-    details: c.timestamp,
-    children: c.keyPoints.map((kp, kIdx) => ({ id: `${c.id}-${kIdx}`, label: kp }))
-  }));
+    // Synthesize exhaustive tree from outline, keyTakeaways, vocabularyTerms, and teacherEmphasis
+    const synthesized: RevisemapTreeNode[] = [];
 
-  const col1 = totalBranches.slice(0, Math.ceil(totalBranches.length / 3));
-  const col2 = totalBranches.slice(Math.ceil(totalBranches.length / 3), Math.ceil((totalBranches.length * 2) / 3));
-  const col3 = totalBranches.slice(Math.ceil((totalBranches.length * 2) / 3));
+    // Main Topic Root
+    const rootTopicNode: RevisemapTreeNode = {
+      title: analysis.videoTitle,
+      badgeType: 'topic',
+      details: analysis.channelName,
+      children: []
+    };
+
+    // 1. Chapters & Outlines
+    if (analysis.outline && analysis.outline.length > 0) {
+      analysis.outline.forEach((chap, idx) => {
+        const chapNode: RevisemapTreeNode = {
+          title: `Chapter ${idx + 1}: ${chap.title}`,
+          badgeType: 'section_purple',
+          details: chap.timestamp,
+          children: [
+            {
+              title: 'Overview',
+              badgeType: 'badge_green',
+              children: [{ title: chap.summary }]
+            }
+          ]
+        };
+
+        if (chap.keyPoints && chap.keyPoints.length > 0) {
+          chapNode.children?.push({
+            title: 'Key Concepts',
+            badgeType: 'badge_brown',
+            children: chap.keyPoints.map((kp) => ({ title: kp }))
+          });
+        }
+
+        rootTopicNode.children?.push(chapNode);
+      });
+    }
+
+    synthesized.push(rootTopicNode);
+
+    // 2. Key Exam Principles
+    if (analysis.keyTakeaways && analysis.keyTakeaways.length > 0) {
+      synthesized.push({
+        title: 'Key Exam Principles',
+        badgeType: 'section_purple',
+        children: analysis.keyTakeaways.map((kt) => ({
+          title: kt.title,
+          badgeType: 'subtopic_blue',
+          details: kt.description
+        }))
+      });
+    }
+
+    // 3. Glossary Terms
+    if (analysis.vocabularyTerms && analysis.vocabularyTerms.length > 0) {
+      synthesized.push({
+        title: 'Key Terms Glossary',
+        badgeType: 'section_purple',
+        children: analysis.vocabularyTerms.map((vt) => ({
+          title: vt.term,
+          badgeType: 'badge_green',
+          details: vt.definition
+        }))
+      });
+    }
+
+    // 4. Teacher Cues
+    if (analysis.teacherEmphasis && analysis.teacherEmphasis.length > 0) {
+      synthesized.push({
+        title: 'Teacher Emphasis & Exam Cues',
+        badgeType: 'section_purple',
+        children: analysis.teacherEmphasis.map((te) => ({
+          title: `${te.tag}: ${te.text}`,
+          details: te.timestamp
+        }))
+      });
+    }
+
+    return synthesized;
+  }, [analysis]);
+
+  // Distribute tree nodes evenly across 4 parallel vertical columns (Revisemap 4-column flow)
+  const col1: RevisemapTreeNode[] = [];
+  const col2: RevisemapTreeNode[] = [];
+  const col3: RevisemapTreeNode[] = [];
+  const col4: RevisemapTreeNode[] = [];
+
+  treeNodes.forEach((node, idx) => {
+    if (idx % 4 === 0) col1.push(node);
+    else if (idx % 4 === 1) col2.push(node);
+    else if (idx % 4 === 2) col3.push(node);
+    else col4.push(node);
+  });
 
   return (
     <div className={`pdf-modal-overlay ${themeMode === 'light' ? 'light-pdf-mode' : 'dark-pdf-mode'}`}>
@@ -219,7 +386,7 @@ export const TreeNotesPdfView: React.FC<TreeNotesPdfViewProps> = ({
               <GitFork style={{ width: 15, height: 15 }} />
             </div>
             <div style={{ fontSize: 13, fontWeight: 800, color: themeMode === 'light' ? '#0f172a' : '#f8fafc' }}>
-              Revisemap-Style Tree PDF
+              Revisemap 4-Column Tree PDF
             </div>
           </div>
         </div>
@@ -315,17 +482,17 @@ export const TreeNotesPdfView: React.FC<TreeNotesPdfViewProps> = ({
         </div>
       </div>
 
-      {/* ==================== REVISEMAP-STYLE TREE PDF DOCUMENT ==================== */}
+      {/* ==================== REVISEMAP-STYLE DENSE 4-COLUMN TREE PDF DOCUMENT ==================== */}
       <div
         ref={pdfContentRef}
         style={{
           width: '100%',
-          maxWidth: 960,
+          maxWidth: 1050,
           margin: '0 auto 40px auto',
           background: themeMode === 'light' ? '#ffffff' : '#090d16',
           color: themeMode === 'light' ? '#0f172a' : '#f8fafc',
-          border: '2px solid #0d9488',
-          borderRadius: 8,
+          border: '2.5px solid #0d9488',
+          borderRadius: 6,
           boxShadow: '0 10px 30px rgba(0,0,0,0.06)',
           fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
           position: 'relative'
@@ -336,60 +503,51 @@ export const TreeNotesPdfView: React.FC<TreeNotesPdfViewProps> = ({
           background: 'linear-gradient(135deg, #7f1d1d 0%, #991b1b 50%, #450a0a 100%)',
           color: '#ffffff',
           textAlign: 'center',
-          padding: '16px 20px',
+          padding: '14px 20px',
           borderBottom: '3px solid #f59e0b'
         }}>
-          <h1 style={{ fontSize: 32, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1, margin: 0, fontFamily: 'Georgia, serif' }}>
+          <h1 style={{ fontSize: 30, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1, margin: 0, fontFamily: 'Georgia, serif' }}>
             YouTube Video To PDF
           </h1>
-          <div style={{ fontSize: 16, fontWeight: 700, color: '#fef08a', marginTop: 4 }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: '#fef08a', marginTop: 3 }}>
             revisemap.com • mindtube.ai
           </div>
         </div>
 
-        {/* 3-COLUMN TREE CONTAINER (EXACT REVISEMAP MATCH) */}
+        {/* DENSE 4-COLUMN TREE CONTAINER (EXACT REVISEMAP MATCH) */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: window.innerWidth < 768 ? '1fr' : 'repeat(3, 1fr)',
-          gap: 16,
-          padding: '20px 16px',
+          gridTemplateColumns: window.innerWidth < 768 ? '1fr' : 'repeat(4, 1fr)',
+          gap: 12,
+          padding: '16px 12px',
           alignItems: 'start'
         }}>
           {/* COLUMN 1 */}
-          <div>
-            {col1.map((branch) => (
-              <RenderTreeNode key={branch.id || branch.label} node={branch as MindMapNode} depth={0} />
+          <div style={{ borderRight: window.innerWidth >= 768 ? '1px solid #cbd5e1' : 'none', paddingRight: 8 }}>
+            {col1.map((node, nIdx) => (
+              <RenderTreeNode key={nIdx} node={node} depth={0} />
             ))}
           </div>
 
           {/* COLUMN 2 */}
-          <div>
-            {col2.map((branch) => (
-              <RenderTreeNode key={branch.id || branch.label} node={branch as MindMapNode} depth={0} />
+          <div style={{ borderRight: window.innerWidth >= 768 ? '1px solid #cbd5e1' : 'none', paddingRight: 8 }}>
+            {col2.map((node, nIdx) => (
+              <RenderTreeNode key={nIdx} node={node} depth={0} />
             ))}
           </div>
 
           {/* COLUMN 3 */}
-          <div>
-            {col3.map((branch) => (
-              <RenderTreeNode key={branch.id || branch.label} node={branch as MindMapNode} depth={0} />
+          <div style={{ borderRight: window.innerWidth >= 768 ? '1px solid #cbd5e1' : 'none', paddingRight: 8 }}>
+            {col3.map((node, nIdx) => (
+              <RenderTreeNode key={nIdx} node={node} depth={0} />
             ))}
+          </div>
 
-            {/* Supplementary Glossary / Traps if available */}
-            {analysis.vocabularyTerms && analysis.vocabularyTerms.length > 0 && (
-              <div style={{ marginTop: 14 }}>
-                <div style={{ background: '#166534', color: '#ffffff', border: '1.5px solid #86efac', padding: '4px 10px', fontSize: 12.5, fontWeight: 800, borderRadius: 4, display: 'inline-block', marginBottom: 6 }}>
-                  शब्दकोश (Glossary)
-                </div>
-                <div style={{ paddingLeft: 8, borderLeft: '2px solid #16a34a', marginLeft: 6, display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  {analysis.vocabularyTerms.slice(0, 10).map((v, idx) => (
-                    <div key={idx} style={{ fontSize: 11, color: '#14532d' }}>
-                      |_ <strong>{v.term}:</strong> {v.definition}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+          {/* COLUMN 4 */}
+          <div>
+            {col4.map((node, nIdx) => (
+              <RenderTreeNode key={nIdx} node={node} depth={0} />
+            ))}
           </div>
         </div>
 

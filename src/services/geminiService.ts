@@ -747,6 +747,35 @@ You MUST strictly return ONLY raw valid JSON matching this schema:
       "explanation": "Planaria contains specialized cells capable of proliferation and differentiation into complete organism parts.",
       "whyOthersWrong": "Amoeba reproduces by Binary Fission; Spirogyra by Fragmentation; Hydra primarily by Budding."
     }
+  ],
+  "revisemapTree": [
+    {
+      "title": "Main Subject Name",
+      "badgeType": "topic",
+      "children": [
+        {
+          "title": "Section Title",
+          "badgeType": "section_purple",
+          "children": [
+            {
+              "title": "Category (e.g. Features)",
+              "badgeType": "badge_green",
+              "children": [
+                {
+                  "title": "Key Concept / Method",
+                  "badgeType": "subtopic_blue",
+                  "details": "Example or detail",
+                  "children": [
+                    { "title": "Sub-detail point 1" },
+                    { "title": "Sub-detail point 2" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
   ]
 }
 `;
@@ -807,6 +836,7 @@ You MUST strictly return ONLY raw valid JSON matching this schema:
         detailedNotes: parsedData.detailedNotes || '',
         comparisonTables: parsedData.comparisonTables || [],
         teacherEmphasis: parsedData.teacherEmphasis || [],
+        revisemapTree: parsedData.revisemapTree || [],
         vocabularyTerms: parsedData.vocabularyTerms || [],
         formulasAndEquations: parsedData.formulasAndEquations || [],
         mcqAnswerKey: parsedData.mcqAnswerKey || [],

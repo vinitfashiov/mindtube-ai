@@ -65,6 +65,14 @@ export interface TeacherEmphasis {
   timestamp?: string;
 }
 
+export interface RevisemapTreeNode {
+  id?: string;
+  title: string;
+  badgeType?: 'topic' | 'section_purple' | 'badge_green' | 'badge_brown' | 'subtopic_blue' | 'item';
+  details?: string;
+  children?: RevisemapTreeNode[];
+}
+
 export interface VideoNoteAnalysis {
   id: string;
   videoId: string;
@@ -93,6 +101,7 @@ export interface VideoNoteAnalysis {
   // Structured Content
   comparisonTables?: ComparisonTable[];
   teacherEmphasis?: TeacherEmphasis[];
+  revisemapTree?: RevisemapTreeNode[]; // EXHAUSTIVE Revisemap-style tree of the whole video
   formulasAndEquations?: string[];
   vocabularyTerms?: { term: string; definition: string }[];
   
