@@ -653,11 +653,19 @@ ABSOLUTE CRITICAL INSTRUCTIONS & ACCURACY AUDIT:
 4. COMPARISON TABLES & TEACHER EMPHASIS:
    - comparisonTables: Extract side-by-side comparative matrices (e.g. Asexual vs Sexual Reproduction, Binary Fission vs Fragmentation).
    - teacherEmphasis: Highlight teacher cues like "🔥 Most Important", "⚠️ Common Confusion", "🧠 Mnemonic", "✍️ Exam Answer", "🎯 PYQ Concept", "📌 Teacher Repeated".
-5. UNBIASED PRACTICE TEST & SEPARATE ANSWER KEY:
-   - quiz: Questions and options ONLY (so students can test themselves without seeing answers immediately).
-   - mcqAnswerKey: Separate answer key containing correct option, explanation, and why other options are wrong.
+6. EXHAUSTIVE REVISEMAP TREE SYSTEM (revisemapTree):
+   - revisemapTree MUST BE AN EXHAUSTIVE 4-LEVEL HIERARCHICAL TREE GRAPH containing 80 to 150 nodes total.
+   - It MUST capture 100% of the video's content: every definition, importance, method, organ, hormone, process, example, and detail.
+   - For Hindi videos (or targetLanguage 'hi'), write all titles and details in natural Devanagari Hindi with English terms in brackets (e.g. 'द्विखंडन (Binary Fission)').
+   - Assign appropriate badgeType to each node:
+     * 'topic' for root video subject
+     * 'section_purple' for major anatomical systems and main sections (e.g. 'नर जनन तंत्र', 'मादा जनन तंत्र', 'परिभाषा', 'महत्व', 'प्रकार')
+     * 'badge_green' for feature/method badges (e.g. 'विशेषताएं', 'विधियाँ', 'मासिक चक्र (मेंसुरेशन साइकिल)')
+     * 'badge_brown' for attribute labels (e.g. 'किन में होता है', 'कार्य', 'स्थिति', 'स्रोत')
+     * 'subtopic_blue' for sub-topics/methods (e.g. 'अलैंगिक जनन', 'द्विखंडन', 'बहुविखंडन', 'खंडन (Fragmentation)', 'पुनर्जनन (Regeneration)', 'मुकुलन (Budding)')
+     * 'item' for leaf details and examples.
 
-${isHindi ? '- CRITICAL LANGUAGE INSTRUCTION: Generate all text in HINDI (हिन्दी). Use Devanagari script for Hindi text, with technical terminology (like Python, React, Code, Physics) written naturally in English.' : ''}
+${isHindi ? '- CRITICAL LANGUAGE INSTRUCTION: Generate ALL text in HINDI (हिन्दी). Use Devanagari script for Hindi text, with technical terminology (like Python, React, Code, Physics, Testis) written naturally in English or Hindi brackets.' : ''}
 
 You MUST strictly return ONLY raw valid JSON matching this schema:
 {

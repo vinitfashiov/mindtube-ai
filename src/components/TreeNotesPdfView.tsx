@@ -292,49 +292,118 @@ export const TreeNotesPdfView: React.FC<TreeNotesPdfViewProps> = ({
     }
   };
 
-  // Synthesize tree nodes from all available content to ensure 100% video density
+  // Synthesize tree nodes from all available content (outline, detailedNotes, terms, takeaways)
   const treeNodes: RevisemapTreeNode[] = React.useMemo(() => {
-    if (analysis.revisemapTree && analysis.revisemapTree.length > 0) {
+    if (analysis.revisemapTree && analysis.revisemapTree.length >= 5) {
       return analysis.revisemapTree;
     }
 
     const synthesized: RevisemapTreeNode[] = [];
 
-    // Main Topic Box
-    synthesized.push({
+    // Main Topic Root Box
+    const rootBox: RevisemapTreeNode = {
       title: analysis.videoTitle,
       badgeType: 'topic',
       details: analysis.channelName,
-      children: analysis.outline?.slice(0, 3).map((c) => ({
-        title: c.title,
-        badgeType: 'subtopic_blue',
-        details: c.timestamp,
-        children: c.keyPoints.map((kp) => ({ title: kp }))
-      }))
-    });
+      children: []
+    };
 
-    if (analysis.outline && analysis.outline.length > 3) {
-      analysis.outline.slice(3).forEach((chap) => {
-        synthesized.push({
-          title: chap.title,
+    // 1. All Chapters & Granular Points from Outline
+    if (analysis.outline && analysis.outline.length > 0) {
+      analysis.outline.forEach((chap, idx) => {
+        const chapNode: RevisemapTreeNode = {
+          title: `Chapter ${idx + 1}: ${chap.title}`,
           badgeType: 'section_purple',
           details: chap.timestamp,
-          children: chap.keyPoints.map((kp) => ({ title: kp }))
-        });
+          children: [
+            {
+              title: 'Overview',
+              badgeType: 'badge_green',
+              children: [{ title: chap.summary }]
+            }
+          ]
+        };
+
+        if (chap.keyPoints && chap.keyPoints.length > 0) {
+          chapNode.children?.push({
+            title: 'Key Concepts & Methods',
+            badgeType: 'badge_brown',
+            children: chap.keyPoints.map((kp) => ({ title: kp }))
+          });
+        }
+
+        rootBox.children?.push(chapNode);
       });
     }
 
+    synthesized.push(rootBox);
+
+    // 2. Parse Detailed Lecture Notes Markdown into Granular Tree Nodes
+    if (analysis.detailedNotes) {
+      const markdownLines = analysis.detailedNotes.split('\n');
+      let currentSection: RevisemapTreeNode | null = null;
+      let currentSubtopic: RevisemapTreeNode | null = null;
+
+      markdownLines.forEach((line) => {
+        const trimmed = line.trim();
+        if (!trimmed) return;
+
+        if (trimmed.startsWith('## ')) {
+          currentSection = {
+            title: trimmed.replace(/^##\s*/, '').replace(/\[.*?\]/g, '').trim(),
+            badgeType: 'section_purple',
+            children: []
+          };
+          synthesized.push(currentSection);
+          currentSubtopic = null;
+        } else if (trimmed.startsWith('### ')) {
+          const subTitle = trimmed.replace(/^###\s*/, '').replace(/\[.*?\]/g, '').trim();
+          currentSubtopic = {
+            title: subTitle,
+            badgeType: 'subtopic_blue',
+            children: []
+          };
+          if (currentSection) {
+            currentSection.children = currentSection.children || [];
+            currentSection.children.push(currentSubtopic);
+          } else {
+            synthesized.push(currentSubtopic);
+          }
+        } else if (trimmed.startsWith('- ') || trimmed.startsWith('* ') || trimmed.startsWith('• ')) {
+          const content = trimmed.replace(/^[-*•]\s*/, '').replace(/\[.*?\]/g, '').trim();
+          const parts = content.split(/:\s*/);
+          const itemNode: RevisemapTreeNode = {
+            title: parts[0],
+            details: parts.slice(1).join(': ') || undefined
+          };
+
+          if (currentSubtopic) {
+            currentSubtopic.children = currentSubtopic.children || [];
+            currentSubtopic.children.push(itemNode);
+          } else if (currentSection) {
+            currentSection.children = currentSection.children || [];
+            currentSection.children.push(itemNode);
+          } else {
+            synthesized.push(itemNode);
+          }
+        }
+      });
+    }
+
+    // 3. Key Takeaways Section
     if (analysis.keyTakeaways && analysis.keyTakeaways.length > 0) {
       synthesized.push({
         title: 'महत्वपूर्ण नियम (Exam Principles)',
         badgeType: 'badge_green',
         children: analysis.keyTakeaways.map((kt) => ({
           title: kt.title,
+          badgeType: 'subtopic_blue',
           details: kt.description
         }))
       });
     }
 
+    // 4. Vocabulary Glossary Section
     if (analysis.vocabularyTerms && analysis.vocabularyTerms.length > 0) {
       synthesized.push({
         title: 'शब्दकोश (Glossary)',
