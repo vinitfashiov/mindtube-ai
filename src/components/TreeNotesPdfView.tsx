@@ -18,7 +18,7 @@ interface TreeNotesPdfViewProps {
   onSwitchStyle?: (style: 'handbook' | 'tree') => void;
 }
 
-// Exact Revisemap Badge & Line Branch Renderer (Same-to-same target match)
+// Exact Revisemap Badge & Line Branch Renderer
 const RenderRevisemapBranch: React.FC<{ node: RevisemapTreeNode; depth?: number }> = ({ node, depth = 0 }) => {
   if (!node || !node.title) return null;
 
@@ -42,7 +42,7 @@ const RenderRevisemapBranch: React.FC<{ node: RevisemapTreeNode; depth?: number 
           color: '#ffffff',
           border: '2px solid #b5a642',
           padding: '2px 7px',
-          fontSize: 11.5,
+          fontSize: 11,
           fontWeight: 800,
           borderRadius: 1,
           display: 'inline-block',
@@ -79,7 +79,7 @@ const RenderRevisemapBranch: React.FC<{ node: RevisemapTreeNode; depth?: number 
           {title}
         </div>
         {details && (
-          <div style={{ fontSize: 10, color: '#0056b3', paddingLeft: 4, marginBottom: 1 }}>
+          <div style={{ fontSize: 9.5, color: '#0056b3', paddingLeft: 4, marginBottom: 1 }}>
             — {details}
           </div>
         )}
@@ -112,7 +112,7 @@ const RenderRevisemapBranch: React.FC<{ node: RevisemapTreeNode; depth?: number 
           {title}
         </div>
         {details && (
-          <div style={{ fontSize: 10, color: '#212529', paddingLeft: 4 }}>
+          <div style={{ fontSize: 9.5, color: '#212529', paddingLeft: 4 }}>
             — {details}
           </div>
         )}
@@ -136,7 +136,7 @@ const RenderRevisemapBranch: React.FC<{ node: RevisemapTreeNode; depth?: number 
           color: '#fde047',
           border: '1px solid #fef08a',
           padding: '1px 5px',
-          fontSize: 10,
+          fontSize: 9.5,
           fontWeight: 700,
           borderRadius: 1,
           display: 'inline-block',
@@ -145,7 +145,7 @@ const RenderRevisemapBranch: React.FC<{ node: RevisemapTreeNode; depth?: number 
           {title}
         </div>
         {details && (
-          <div style={{ fontSize: 10, color: '#212529', paddingLeft: 4 }}>
+          <div style={{ fontSize: 9.5, color: '#212529', paddingLeft: 4 }}>
             — {details}
           </div>
         )}
@@ -164,11 +164,11 @@ const RenderRevisemapBranch: React.FC<{ node: RevisemapTreeNode; depth?: number 
   if (isGreenTitle) {
     return (
       <div style={{ marginTop: 3, marginBottom: 1 }}>
-        <div style={{ fontSize: 11, fontWeight: 800, color: '#1a7a3e' }}>
+        <div style={{ fontSize: 10.5, fontWeight: 800, color: '#1a7a3e' }}>
           — {title}
         </div>
         {details && (
-          <div style={{ fontSize: 10, color: '#212529', paddingLeft: 4 }}>
+          <div style={{ fontSize: 9.5, color: '#212529', paddingLeft: 4 }}>
             — {details}
           </div>
         )}
@@ -187,11 +187,11 @@ const RenderRevisemapBranch: React.FC<{ node: RevisemapTreeNode; depth?: number 
   if (isPurpleTitle) {
     return (
       <div style={{ marginTop: 3, marginBottom: 1 }}>
-        <div style={{ fontSize: 11, fontWeight: 800, color: '#6b21a8' }}>
+        <div style={{ fontSize: 10.5, fontWeight: 800, color: '#6b21a8' }}>
           — {title}
         </div>
         {details && (
-          <div style={{ fontSize: 10, color: '#212529', paddingLeft: 4 }}>
+          <div style={{ fontSize: 9.5, color: '#212529', paddingLeft: 4 }}>
             — {details}
           </div>
         )}
@@ -210,11 +210,11 @@ const RenderRevisemapBranch: React.FC<{ node: RevisemapTreeNode; depth?: number 
   if (node.children && node.children.length > 0) {
     return (
       <div style={{ marginTop: 2, marginBottom: 1 }}>
-        <div style={{ fontSize: 11, fontWeight: 800, color: '#0056b3' }}>
+        <div style={{ fontSize: 10.5, fontWeight: 800, color: '#0056b3' }}>
           — {title}
         </div>
         {details && (
-          <div style={{ fontSize: 10, color: '#212529', paddingLeft: 4 }}>
+          <div style={{ fontSize: 9.5, color: '#212529', paddingLeft: 4 }}>
             — {details}
           </div>
         )}
@@ -229,7 +229,7 @@ const RenderRevisemapBranch: React.FC<{ node: RevisemapTreeNode; depth?: number 
 
   // 8. Standard Tree Leaf Item (— text)
   return (
-    <div style={{ fontSize: 10, color: '#212529', lineHeight: 1.35, marginTop: 1, paddingLeft: 1 }}>
+    <div style={{ fontSize: 9.5, color: '#212529', lineHeight: 1.3, marginTop: 1, paddingLeft: 1 }}>
       <div style={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
         <span style={{ color: '#0056b3', fontWeight: 'bold', flexShrink: 0 }}>—</span>
         <div>
@@ -275,12 +275,12 @@ export const TreeNotesPdfView: React.FC<TreeNotesPdfViewProps> = ({
       const filename = `MindTube_Revisemap_${analysis.videoTitle.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 40)}.pdf`;
 
       const opt = {
-        margin: [2, 2, 2, 2] as [number, number, number, number],
+        margin: [0, 0, 0, 0] as [number, number, number, number],
         filename,
         image: { type: 'jpeg' as const, quality: 0.98 },
         html2canvas: { scale: 3, useCORS: true, logging: false, letterRendering: true },
         jsPDF: { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const },
-        pagebreak: { mode: ['avoid-all' as const, 'css' as const, 'legacy' as const] }
+        pagebreak: { mode: ['css' as const, 'legacy' as const] }
       };
 
       await html2pdf().set(opt).from(element).save();
@@ -414,18 +414,15 @@ export const TreeNotesPdfView: React.FC<TreeNotesPdfViewProps> = ({
     return synthesized;
   }, [analysis]);
 
-  // Distribute tree nodes evenly across 4 parallel vertical columns
-  const col1: RevisemapTreeNode[] = [];
-  const col2: RevisemapTreeNode[] = [];
-  const col3: RevisemapTreeNode[] = [];
-  const col4: RevisemapTreeNode[] = [];
-
-  treeNodes.forEach((node, idx) => {
-    if (idx % 4 === 0) col1.push(node);
-    else if (idx % 4 === 1) col2.push(node);
-    else if (idx % 4 === 2) col3.push(node);
-    else col4.push(node);
-  });
+  // Chunk tree nodes into discrete A4 page sheets (~40-50 nodes per page) so NO text or border is ever cut in half!
+  const pages = React.useMemo(() => {
+    const NODES_PER_PAGE = 44;
+    const pageList: RevisemapTreeNode[][] = [];
+    for (let i = 0; i < treeNodes.length; i += NODES_PER_PAGE) {
+      pageList.push(treeNodes.slice(i, i + NODES_PER_PAGE));
+    }
+    return pageList.length > 0 ? pageList : [[]];
+  }, [treeNodes]);
 
   return (
     <div className={`pdf-modal-overlay ${themeMode === 'light' ? 'light-pdf-mode' : 'dark-pdf-mode'}`}>
@@ -465,7 +462,7 @@ export const TreeNotesPdfView: React.FC<TreeNotesPdfViewProps> = ({
               <GitFork style={{ width: 15, height: 15 }} />
             </div>
             <div style={{ fontSize: 13, fontWeight: 800, color: themeMode === 'light' ? '#0f172a' : '#f8fafc' }}>
-              Revisemap Tree PDF
+              Revisemap Tree PDF ({pages.length} A4 Pages)
             </div>
           </div>
         </div>
@@ -561,122 +558,146 @@ export const TreeNotesPdfView: React.FC<TreeNotesPdfViewProps> = ({
         </div>
       </div>
 
-      {/* ==================== REVISEMAP TARGET PDF (EXACT IMAGE 1 & 2 MATCH) ==================== */}
-      <div
-        ref={pdfContentRef}
-        style={{
-          width: '100%',
-          maxWidth: 960,
-          margin: '0 auto 40px auto',
-          background: themeMode === 'light' ? '#ffffff' : '#090d16',
-          color: themeMode === 'light' ? '#0f172a' : '#f8fafc',
-          border: '3px solid #005656',
-          padding: 4,
-          borderRadius: 2,
-          boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif',
-          position: 'relative'
-        }}
-      >
-        <div style={{ border: '1px solid #005656', padding: '12px 10px', borderRadius: 1, background: '#ffffff', position: 'relative' }}>
-          
-          {/* REVISEMAP WATERMARK IN BACKGROUND */}
-          <div style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%) rotate(-25deg)',
-            fontSize: 75,
-            fontWeight: 900,
-            color: 'rgba(0, 86, 86, 0.04)',
-            pointerEvents: 'none',
-            whiteSpace: 'nowrap',
-            zIndex: 0,
-            fontFamily: 'Arial, sans-serif'
-          }}>
-            revisemap.com
-          </div>
+      {/* ==================== DISCRETE SELF-CONTAINED A4 PAGE SHEETS ==================== */}
+      <div ref={pdfContentRef} style={{ width: '100%', maxWidth: 960, margin: '0 auto' }}>
+        {pages.map((pageNodes, pIdx) => {
+          // Distribute this page's nodes across 4 columns
+          const col1: RevisemapTreeNode[] = [];
+          const col2: RevisemapTreeNode[] = [];
+          const col3: RevisemapTreeNode[] = [];
+          const col4: RevisemapTreeNode[] = [];
 
-          {/* REVISEMAP HEADER BANNER (EXACT REDDISH VIGNETTE MATCH) */}
-          <div style={{
-            background: 'linear-gradient(90deg, #7a2220 0%, #d87974 25%, #fcebeb 50%, #d87974 75%, #7a2220 100%)',
-            border: '1px solid #7a2220',
-            color: '#000000',
-            textAlign: 'center',
-            padding: '14px 20px',
-            borderRadius: 3,
-            marginBottom: 12,
-            position: 'relative',
-            zIndex: 1
-          }}>
-            <h1 style={{ fontSize: 34, fontWeight: 900, textTransform: 'none', letterSpacing: 0.5, margin: 0, fontFamily: 'Arial, Helvetica, sans-serif', color: '#000000' }}>
-              Youtube Video To PDF
-            </h1>
-            <div style={{ fontSize: 18, fontWeight: 900, color: '#000000', marginTop: 2, fontFamily: 'Arial, sans-serif' }}>
-              revisemap.com
+          pageNodes.forEach((node, nIdx) => {
+            if (nIdx % 4 === 0) col1.push(node);
+            else if (nIdx % 4 === 1) col2.push(node);
+            else if (nIdx % 4 === 2) col3.push(node);
+            else col4.push(node);
+          });
+
+          return (
+            <div
+              key={pIdx}
+              style={{
+                width: '100%',
+                maxWidth: 960,
+                minHeight: 1180,
+                margin: '0 auto 30px auto',
+                background: themeMode === 'light' ? '#ffffff' : '#090d16',
+                color: themeMode === 'light' ? '#0f172a' : '#f8fafc',
+                border: '3px solid #005656',
+                padding: 4,
+                borderRadius: 2,
+                boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif',
+                position: 'relative',
+                boxSizing: 'border-box',
+                pageBreakAfter: pIdx < pages.length - 1 ? 'always' : 'auto',
+                breakAfter: pIdx < pages.length - 1 ? 'page' : 'auto'
+              }}
+            >
+              <div style={{ border: '1px solid #005656', padding: '10px 8px', borderRadius: 1, background: '#ffffff', minHeight: 1160, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', boxSizing: 'border-box', position: 'relative' }}>
+                
+                {/* REVISEMAP WATERMARK IN BACKGROUND */}
+                <div style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%) rotate(-25deg)',
+                  fontSize: 75,
+                  fontWeight: 900,
+                  color: 'rgba(0, 86, 86, 0.03)',
+                  pointerEvents: 'none',
+                  whiteSpace: 'nowrap',
+                  zIndex: 0,
+                  fontFamily: 'Arial, sans-serif'
+                }}>
+                  revisemap.com
+                </div>
+
+                <div>
+                  {/* REVISEMAP HEADER BANNER ON EVERY PAGE */}
+                  <div style={{
+                    background: 'linear-gradient(90deg, #7a2220 0%, #d87974 25%, #fcebeb 50%, #d87974 75%, #7a2220 100%)',
+                    border: '1px solid #7a2220',
+                    color: '#000000',
+                    textAlign: 'center',
+                    padding: '12px 16px',
+                    borderRadius: 2,
+                    marginBottom: 10,
+                    position: 'relative',
+                    zIndex: 1
+                  }}>
+                    <h1 style={{ fontSize: 32, fontWeight: 900, textTransform: 'none', letterSpacing: 0.5, margin: 0, fontFamily: 'Arial, Helvetica, sans-serif', color: '#000000' }}>
+                      Youtube Video To PDF
+                    </h1>
+                    <div style={{ fontSize: 16, fontWeight: 900, color: '#000000', marginTop: 1, fontFamily: 'Arial, sans-serif' }}>
+                      revisemap.com
+                    </div>
+                  </div>
+
+                  {/* DENSE 4-COLUMN TREE GRID FOR THIS PAGE */}
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(4, 1fr)',
+                    gap: 6,
+                    alignItems: 'start',
+                    position: 'relative',
+                    zIndex: 1
+                  }}>
+                    {/* COLUMN 1 */}
+                    <div style={{ borderRight: '1px solid #005656', paddingRight: 4 }}>
+                      {col1.map((node, nIdx) => (
+                        <RenderRevisemapBranch key={nIdx} node={node} depth={0} />
+                      ))}
+                    </div>
+
+                    {/* COLUMN 2 */}
+                    <div style={{ borderRight: '1px solid #005656', paddingRight: 4, paddingLeft: 4 }}>
+                      {col2.map((node, nIdx) => (
+                        <RenderRevisemapBranch key={nIdx} node={node} depth={0} />
+                      ))}
+                    </div>
+
+                    {/* COLUMN 3 */}
+                    <div style={{ borderRight: '1px solid #005656', paddingRight: 4, paddingLeft: 4 }}>
+                      {col3.map((node, nIdx) => (
+                        <RenderRevisemapBranch key={nIdx} node={node} depth={0} />
+                      ))}
+                    </div>
+
+                    {/* COLUMN 4 */}
+                    <div style={{ paddingLeft: 4 }}>
+                      {col4.map((node, nIdx) => (
+                        <RenderRevisemapBranch key={nIdx} node={node} depth={0} />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* FOOTER BANNER ON EVERY PAGE */}
+                <div style={{
+                  background: '#005656',
+                  color: '#ffffff',
+                  textAlign: 'center',
+                  padding: '5px 12px',
+                  fontSize: 10.5,
+                  fontWeight: 600,
+                  marginTop: 10,
+                  borderRadius: 1,
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  position: 'relative',
+                  zIndex: 1
+                }}>
+                  <span>revisemap.com</span>
+                  <span>This is a class notes pdf. It may contains class info. [Not for sale]</span>
+                </div>
+
+              </div>
             </div>
-          </div>
-
-          {/* DENSE 4-COLUMN TREE GRID WITH DIVIDER LINES */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: window.innerWidth < 768 ? '1fr' : 'repeat(4, 1fr)',
-            gap: 6,
-            minHeight: 700,
-            alignItems: 'start',
-            position: 'relative',
-            zIndex: 1
-          }}>
-            {/* COLUMN 1 */}
-            <div style={{ borderRight: window.innerWidth >= 768 ? '1px solid #005656' : 'none', paddingRight: 4 }}>
-              {col1.map((node, nIdx) => (
-                <RenderRevisemapBranch key={nIdx} node={node} depth={0} />
-              ))}
-            </div>
-
-            {/* COLUMN 2 */}
-            <div style={{ borderRight: window.innerWidth >= 768 ? '1px solid #005656' : 'none', paddingRight: 4, paddingLeft: 4 }}>
-              {col2.map((node, nIdx) => (
-                <RenderRevisemapBranch key={nIdx} node={node} depth={0} />
-              ))}
-            </div>
-
-            {/* COLUMN 3 */}
-            <div style={{ borderRight: window.innerWidth >= 768 ? '1px solid #005656' : 'none', paddingRight: 4, paddingLeft: 4 }}>
-              {col3.map((node, nIdx) => (
-                <RenderRevisemapBranch key={nIdx} node={node} depth={0} />
-              ))}
-            </div>
-
-            {/* COLUMN 4 */}
-            <div style={{ paddingLeft: 4 }}>
-              {col4.map((node, nIdx) => (
-                <RenderRevisemapBranch key={nIdx} node={node} depth={0} />
-              ))}
-            </div>
-          </div>
-
-          {/* FOOTER BANNER */}
-          <div style={{
-            background: '#005656',
-            color: '#ffffff',
-            textAlign: 'center',
-            padding: '6px 14px',
-            fontSize: 11,
-            fontWeight: 600,
-            marginTop: 12,
-            borderRadius: 1,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            position: 'relative',
-            zIndex: 1
-          }}>
-            <span>revisemap.com</span>
-            <span>This is a class notes pdf. It may contains class info. [Not for sale]</span>
-          </div>
-
-        </div>
+          );
+        })}
       </div>
     </div>
   );
