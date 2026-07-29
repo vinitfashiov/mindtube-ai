@@ -34,7 +34,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header className="agent-header" style={isDesktop ? { maxWidth: '100%', borderBottom: 'none', background: 'transparent', padding: '12px 20px' } : undefined}>
       {/* Left Title & Sidebar Toggle Icon */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <button
           onClick={onToggleSidebar}
           title={isSidebarOpen ? "Collapse Sidebar" : "Expand Sidebar"}
@@ -49,7 +49,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             justifyContent: 'center',
             color: '#09090b',
             cursor: 'pointer',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
+            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+            flexShrink: 0
           }}
         >
           <PanelLeft style={{ width: 18, height: 18 }} />
@@ -72,7 +73,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <Sparkles style={{ width: 16, height: 16, color: '#fff' }} />
           </div>
 
-          <div>
+          <div style={{ display: isDesktop ? 'block' : 'none' }}>
             <div style={{ fontSize: 14, fontWeight: 800, color: '#0f172a', fontFamily: 'Outfit, sans-serif', lineHeight: 1.1 }}>
               MindTube AI
             </div>
@@ -81,53 +82,54 @@ export const Navbar: React.FC<NavbarProps> = ({
       </div>
 
       {/* Right Actions & New Chat Button */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
         {/* API Cost Badge Pill */}
         {apiCostSummary && (
           <button
             onClick={onOpenCostDashboard}
             title="View Detailed API Cost & Token Usage Breakdown"
             style={{
-              padding: '5px 10px',
+              padding: '5px 8px',
               borderRadius: 9999,
               background: '#f0fdf4',
               border: '1px solid #bbf7d0',
               color: '#15803d',
-              fontSize: 11.5,
+              fontSize: 11,
               fontWeight: 700,
               display: 'flex',
               alignItems: 'center',
-              gap: 5,
+              gap: 4,
               cursor: 'pointer',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
+              whiteSpace: 'nowrap',
+              flexShrink: 0
             }}
           >
-            <Coins style={{ width: 13, height: 13, color: '#16a34a' }} />
+            <Coins style={{ width: 12, height: 12, color: '#16a34a' }} />
             <span>${apiCostSummary.totalCostUsd.toFixed(4)}</span>
-            <span style={{ fontSize: 10, padding: '1px 5px', borderRadius: 9999, background: '#dcfce7', color: '#166534' }}>
-              ₹{apiCostSummary.totalCostInr.toFixed(2)}
-            </span>
           </button>
         )}
 
         <button
           onClick={onNewChat}
+          title="New Chat"
           style={{
-            padding: '6px 14px',
+            padding: isDesktop ? '6px 14px' : '6px 10px',
             borderRadius: 9999,
             background: '#eff6ff',
             border: '1px solid #dbeafe',
             color: '#2563eb',
-            fontSize: 12.5,
+            fontSize: 12,
             fontWeight: 700,
             display: 'flex',
             alignItems: 'center',
-            gap: 6,
-            cursor: 'pointer'
+            gap: 4,
+            cursor: 'pointer',
+            whiteSpace: 'nowrap',
+            flexShrink: 0
           }}
         >
           <Plus style={{ width: 14, height: 14 }} />
-          <span>New Chat</span>
+          <span>New</span>
         </button>
       </div>
     </header>
