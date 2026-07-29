@@ -167,8 +167,7 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
   onOpenPdf,
   onOpenChat,
   currentLanguage,
-  onSelectLanguage,
-  activeSessionTitle
+  onSelectLanguage
 }) => {
   const [inputText, setInputText] = useState('');
   const [isListening, setIsListening] = useState(false);
@@ -404,12 +403,6 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
       ) : (
         /* Active Chat Session Stream */
         <div className="no-scrollbar" style={{ flex: 1, height: '100%', minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 740, margin: '0 auto', width: '100%', padding: '20px 16px 20px 16px' }}>
-          {activeSessionTitle && (
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.6, borderBottom: '1px solid #f1f5f9', paddingBottom: 6, marginBottom: 4 }}>
-              Session: {activeSessionTitle}
-            </div>
-          )}
-
           {messages.map((msg) => {
             const card = msg.analysisCard;
             const currentActiveWidget = activeWidgets[msg.id] || null;
@@ -425,70 +418,69 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
                   width: '100%'
                 }}
               >
-                {/* Header Row with Avatar & Timestamp */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  {msg.sender === 'assistant' ? (
+                {/* User Message Rendering (Manus 1:1 Style - No Duplication) */}
+                {msg.sender === 'user' ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, maxWidth: '85%' }}>
+                    {msg.text.includes('youtube.com') || msg.text.includes('watch?v=') || msg.text.startsWith('http') ? (
+                      <div>
+                        <div style={{ fontSize: 11, color: '#a1a1aa', textAlign: 'right', marginBottom: 4 }}>
+                          🔒 YouTube Video • {msg.timestamp}
+                        </div>
+                        <div style={{ padding: '10px 14px', borderRadius: 14, background: '#ffffff', border: '1px solid #e4e4e7', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+                          <div style={{ width: 32, height: 32, borderRadius: 8, background: '#fee2e2', color: '#dc2626', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 13 }}>
+                            P
+                          </div>
+                          <div>
+                            <div style={{ fontSize: 12.5, fontWeight: 600, color: '#09090b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 280 }}>
+                              {msg.text}
+                            </div>
+                            <div style={{ fontSize: 11, color: '#71717a' }}>YouTube Video • URL</div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <div style={{ fontSize: 11, color: '#a1a1aa', textAlign: 'right', marginBottom: 4 }}>
+                          You • {msg.timestamp}
+                        </div>
+                        <div style={{ padding: '9px 15px', borderRadius: '14px 14px 2px 14px', background: '#ffffff', border: '1px solid #e4e4e7', color: '#09090b', fontSize: 13.5, boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
+                          {msg.text}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 6, width: '100%' }}>
+                    {/* Assistant Header Row */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                       <div style={{ width: 22, height: 22, borderRadius: 6, background: '#09090b', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <Sparkles style={{ width: 12, height: 12 }} />
                       </div>
-                      <span style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 13.5, color: '#09090b' }}>
+                      <span style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 14, color: '#09090b' }}>
                         mindtube
                       </span>
                       <span style={{ fontSize: 10, fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: '#f4f4f5', color: '#71717a' }}>
                         Lite
                       </span>
-                    </div>
-                  ) : (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <span style={{ fontSize: 11, color: '#71717a', fontWeight: 500 }}>
-                        {msg.text.includes('youtube.com') || msg.text.includes('watch?v=') ? '🔒 Youtube Video' : 'You'} • {msg.timestamp}
-                      </span>
-                    </div>
-                  )}
-                  {msg.sender === 'assistant' && (
-                    <span style={{ fontSize: 11, color: '#a1a1aa' }}>• {msg.timestamp}</span>
-                  )}
+                      <span style={{ fontSize: 11, color: '#a1a1aa', marginLeft: 2 }}>• {msg.timestamp}</span>
 
-                  {msg.sender === 'assistant' && !msg.isProcessing && (
-                    <button
-                      onClick={() => handleSpeakText(msg.text)}
-                      title="Read aloud with Voice AI"
-                      style={{ color: '#71717a', padding: 2, background: 'transparent', border: 'none', cursor: 'pointer' }}
-                    >
-                      <Volume2 style={{ width: 13, height: 13 }} />
-                    </button>
-                  )}
+                      {!msg.isProcessing && (
+                        <button
+                          onClick={() => handleSpeakText(msg.text)}
+                          title="Read aloud with Voice AI"
+                          style={{ color: '#71717a', padding: 2, background: 'transparent', border: 'none', cursor: 'pointer' }}
+                        >
+                          <Volume2 style={{ width: 13, height: 13 }} />
+                        </button>
+                      )}
 
-                  {msg.usageCost && (
-                    <span style={{ fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 9999, background: '#f0fdf4', color: '#166534', border: '1px solid #bbf7d0', display: 'inline-flex', alignItems: 'center', gap: 3 }}>
-                      <Coins style={{ width: 10, height: 10 }} />
-                      ${msg.usageCost.costUsd.toFixed(4)}
-                    </span>
-                  )}
-                </div>
-
-                {/* Message Content Container (Manus 1:1 Style) */}
-                {msg.sender === 'user' ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, maxWidth: '85%' }}>
-                    {(msg.text.includes('youtube.com') || msg.text.includes('watch?v=')) && (
-                      <div style={{ padding: '8px 12px', borderRadius: 12, background: '#ffffff', border: '1px solid #e4e4e7', display: 'flex', alignItems: 'center', gap: 10, boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
-                        <div style={{ width: 28, height: 28, borderRadius: 6, background: '#fee2e2', color: '#dc2626', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 12 }}>
-                          P
-                        </div>
-                        <div>
-                          <div style={{ fontSize: 12, fontWeight: 600, color: '#09090b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 220 }}>
-                            {msg.text}
-                          </div>
-                          <div style={{ fontSize: 10.5, color: '#71717a' }}>YouTube Video • URL</div>
-                        </div>
-                      </div>
-                    )}
-                    <div style={{ padding: '8px 14px', borderRadius: 12, background: '#ffffff', border: '1px solid #e4e4e7', color: '#09090b', fontSize: 13, boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
-                      {msg.text}
+                      {msg.usageCost && (
+                        <span style={{ fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 9999, background: '#f0fdf4', color: '#166534', border: '1px solid #bbf7d0', display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                          <Coins style={{ width: 10, height: 10 }} />
+                          ${msg.usageCost.costUsd.toFixed(4)}
+                        </span>
+                      )}
                     </div>
-                  </div>
-                ) : (
                   <div
                     style={{
                       maxWidth: '100%',
@@ -938,9 +930,10 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
                     </div>
                   )}
                 </div>
-              )}
-            </div>
-          );
+              </div>
+            )}
+          </div>
+        );
           })}
 
           {isAiResponding && (
