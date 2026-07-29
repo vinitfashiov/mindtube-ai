@@ -14,7 +14,9 @@ import {
   BookOpen,
   SlidersHorizontal,
   FolderPlus,
-  Key
+  Key,
+  MessageSquare,
+  FileDown
 } from 'lucide-react';
 import { ChatSession } from '../types/notes';
 import { ApiCostSummary } from '../types/cost';
@@ -311,6 +313,8 @@ export const ChatGptSidebar: React.FC<ChatGptSidebarProps> = ({
             ) : (
               sessions.map((session) => {
                 const isActive = session.id === activeSessionId;
+                const hasPdf = session.messages.some((m) => m.analysisCard != null || m.text.includes('youtube.com') || m.text.includes('watch?v='));
+
                 return (
                   <div
                     key={session.id}
@@ -334,7 +338,27 @@ export const ChatGptSidebar: React.FC<ChatGptSidebarProps> = ({
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
-                      <div style={{ width: 14, height: 14, borderRadius: 4, background: isActive ? '#09090b' : '#a1a1aa', flexShrink: 0 }} />
+                      {hasPdf ? (
+                        <div title="Class Notes PDF Session" style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                          <FileDown
+                            style={{
+                              width: 14,
+                              height: 14,
+                              color: isActive ? '#16a34a' : '#22c55e'
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <div title="Text Chat Session" style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                          <MessageSquare
+                            style={{
+                              width: 14,
+                              height: 14,
+                              color: isActive ? '#09090b' : '#71717a'
+                            }}
+                          />
+                        </div>
+                      )}
                       <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {session.title || 'Untitled Task'}
                       </span>
