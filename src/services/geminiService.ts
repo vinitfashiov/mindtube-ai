@@ -2,12 +2,22 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { VideoNoteAnalysis } from "../types/notes";
 import { calculateGeminiCost } from "../types/cost";
 
-// Extract YouTube Video ID from any URL format
+// Extract YouTube Video ID from any URL format (watch, live, shorts, embed, youtu.be, etc.)
 export function extractYouTubeId(url: string): string | null {
   if (!url) return null;
   const cleanUrl = url.trim();
-  const match = cleanUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?.*v=|embed\/|shorts\/|v\/))([a-zA-Z0-9_-]{11})/);
+  
+  // 1. Primary Regex: watch?v=, live/, shorts/, embed/, v/, youtu.be/
+  const match = cleanUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?.*v=|embed\/|shorts\/|live\/|v\/))([a-zA-Z0-9_-]{11})/i);
   if (match && match[1]) return match[1];
+
+  // 2. Direct fallback for /live/ID or v=ID parameter
+  const liveMatch = cleanUrl.match(/\/live\/([a-zA-Z0-9_-]{11})/i);
+  if (liveMatch && liveMatch[1]) return liveMatch[1];
+
+  const vParamMatch = cleanUrl.match(/[?&]v=([a-zA-Z0-9_-]{11})/i);
+  if (vParamMatch && vParamMatch[1]) return vParamMatch[1];
+
   return null;
 }
 

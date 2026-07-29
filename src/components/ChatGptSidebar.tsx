@@ -313,7 +313,7 @@ export const ChatGptSidebar: React.FC<ChatGptSidebarProps> = ({
             ) : (
               sessions.map((session) => {
                 const isActive = session.id === activeSessionId;
-                const hasPdf = session.messages.some((m) => m.analysisCard != null || m.text.includes('youtube.com') || m.text.includes('watch?v='));
+                const hasPdf = session.messages.some((m) => m.analysisCard != null || m.text.includes('youtube.com') || m.text.includes('youtu.be') || m.text.includes('watch?v=') || m.text.includes('live/'));
 
                 return (
                   <div

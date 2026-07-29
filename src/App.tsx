@@ -11,7 +11,7 @@ import { SettingsModal } from './components/SettingsModal';
 
 import { VideoNoteAnalysis, ChatSession, MasterChatMessage } from './types/notes';
 import { ApiCostSummary, ApiUsageLog } from './types/cost';
-import { generateVideoAnalysis, translateAnalysis, chatWithMasterAiDetailed, SAMPLE_ANALYSIS } from './services/geminiService';
+import { generateVideoAnalysis, translateAnalysis, chatWithMasterAiDetailed, extractYouTubeId, SAMPLE_ANALYSIS } from './services/geminiService';
 
 export const App: React.FC = () => {
   const [apiKey, setApiKey] = useState<string>(() => {
@@ -259,7 +259,7 @@ export const App: React.FC = () => {
       currentSessId = freshId;
     }
 
-    const isYouTubeUrl = /(youtu\.be\/|youtube\.com\/(watch\?|embed\/|v\/|shorts\/))/i.test(query);
+    const isYouTubeUrl = extractYouTubeId(query) !== null || /(youtu\.be|youtube\.com|\/watch|\/live|\/shorts|\/embed)/i.test(query);
 
     const userMsg: MasterChatMessage = {
       id: Date.now().toString(),
