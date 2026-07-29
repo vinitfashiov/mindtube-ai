@@ -70,6 +70,11 @@ export interface VideoNoteAnalysis {
   proTipsGlobal?: string[];
   trapsToAvoidGlobal?: string[];
   
+  // Exhaustive PDF Content Fields
+  detailedNotes?: string;  // Long-form chapter-by-chapter detailed lecture notes
+  formulasAndEquations?: string[];  // Math/science formulas extracted from video
+  vocabularyTerms?: { term: string; definition: string }[];  // Key terms glossary
+  
   language?: string; // Current language (e.g. 'en', 'hi', 'es')
   usageCost?: {
     inputTokens: number;

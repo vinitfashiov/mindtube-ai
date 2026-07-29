@@ -629,7 +629,7 @@ export async function generateVideoAnalysis(
 
   const isHindi = targetLanguage === 'hi';
 
-  // Master Prompt for Exhaustive Academic & Technical Notes
+  // Master Prompt for Exhaustive Academic & Technical Notes (ULTRA-DENSE PDF OUTPUT)
   const prompt = `
 You are an elite educational note generator and master academic study assistant.
 I am analyzing the specific YouTube video:
@@ -637,25 +637,52 @@ I am analyzing the specific YouTube video:
 - Channel: "${realChannel}"
 - Video URL: "${youtubeUrl}" (ID: "${videoId}")
 
-CRITICAL INSTRUCTION: Perform an UNCOMPRESSED, EXHAUSTIVE, ACADEMIC MASTERPIECE SYNTHESIS of this exact video ("${realTitle}").
-Do NOT summarize loosely or shorten concepts. Write complete, high-density, multi-paragraph notes so that students preparing for university or competitive exams get 100% of the video's value without missing any single detail, code snippet, math formula, or concept.
+ABSOLUTE CRITICAL INSTRUCTION:
+Perform an UNCOMPRESSED, EXHAUSTIVE, ACADEMIC MASTERPIECE SYNTHESIS of this exact video ("${realTitle}").
+You MUST extract EVERY SINGLE POINT, concept, example, case study, formula, code snippet, technique, tip, and piece of information from this video.
+DO NOT summarize loosely. DO NOT shorten. DO NOT skip anything.
+Write COMPLETE, HIGH-DENSITY, MULTI-PARAGRAPH notes so that a student reading only your notes gets 100% of the video's value — as if they watched the entire video twice.
+The output should be SO DETAILED that it could fill 15-25 printed pages.
 
-${isHindi ? '- CRITICAL LANGUAGE INSTRUCTION: Generate all text (overallSummary, keyTakeaways, outline, mindmap, flashcards, quiz) in HINDI (हिन्दी). Use Devanagari script for Hindi text, with technical terminology (like Python, React, Code, Physics) written naturally in English.' : ''}
+CONTENT DENSITY RULES:
+- overallSummary: Write 8-12 comprehensive sentences covering EVERY major theme, technique, and outcome from the video.
+- keyTakeaways: Generate 8-15 takeaways. Each MUST have a 5-6 sentence deep explanation with examples.
+- outline: Break the video into EVERY chapter/section (aim for 8-15 chapters). Each chapter MUST have:
+  * A detailed multi-paragraph summary (4-8 sentences minimum)
+  * 5-10 key points per chapter
+  * Code snippets if technical content is discussed
+  * Pro tips specific to that chapter
+- detailedNotes: Write EXHAUSTIVE long-form lecture notes (3000-6000 words) covering the ENTIRE video content chapter by chapter. Use markdown formatting with ## headings, bullet points, bold terms, and code blocks. This is the MOST IMPORTANT field — it should read like a complete textbook chapter.
+- flashcards: Generate 20-30 flashcards covering every concept, term, technique, and fact from the video.
+- quiz: Generate 20-25 MCQ questions with 4 options each, covering all topics from the video.
+- mindmap: Create a deep 4-level hierarchy with every sub-concept mapped out.
+- vocabularyTerms: Extract 10-20 key technical terms with precise definitions.
+- formulasAndEquations: Extract any math formulas, equations, algorithms, or technical rules mentioned.
+- proTipsGlobal: 5-8 actionable pro tips.
+- trapsToAvoidGlobal: 5-8 common mistakes/pitfalls.
+- mentalModels: 3-5 mental models or frameworks from the video.
+
+${isHindi ? '- CRITICAL LANGUAGE INSTRUCTION: Generate all text in HINDI (हिन्दी). Use Devanagari script for Hindi text, with technical terminology (like Python, React, Code, Physics) written naturally in English.' : ''}
 
 You MUST strictly return ONLY raw valid JSON matching this schema:
 {
   "videoTitle": "${realTitle.replace(/"/g, '\\"')}",
   "channelName": "${realChannel.replace(/"/g, '\\"')}",
   "duration": "Estimated length",
-  "overallSummary": "Comprehensive 4-5 sentence deep executive synthesis of the video's core thesis and outcomes.",
-  "mentalModels": ["Model 1", "Model 2"],
-  "proTipsGlobal": ["Pro Tip 1", "Pro Tip 2"],
-  "trapsToAvoidGlobal": ["Trap 1", "Trap 2"],
+  "overallSummary": "Comprehensive 8-12 sentence deep executive synthesis covering every major theme.",
+  "mentalModels": ["Model 1", "Model 2", "Model 3", "Model 4", "Model 5"],
+  "proTipsGlobal": ["Pro Tip 1", "Pro Tip 2", "Pro Tip 3", "Pro Tip 4", "Pro Tip 5"],
+  "trapsToAvoidGlobal": ["Trap 1", "Trap 2", "Trap 3", "Trap 4", "Trap 5"],
+  "detailedNotes": "## Chapter 1: Title\\n\\nLong detailed paragraph...\\n\\n## Chapter 2: Title\\n\\nLong detailed paragraph... (3000-6000 words total, markdown formatted)",
+  "vocabularyTerms": [
+    { "term": "Technical Term", "definition": "Precise 2-3 sentence definition with context" }
+  ],
+  "formulasAndEquations": ["Formula 1: description", "Formula 2: description"],
   "keyTakeaways": [
     {
       "id": "kt-1",
       "title": "High-impact takeaway title",
-      "description": "Deep 3-sentence explanation",
+      "description": "Deep 5-6 sentence explanation with examples and context",
       "tag": "Category Tag",
       "impact": "Critical"
     }
@@ -665,8 +692,8 @@ You MUST strictly return ONLY raw valid JSON matching this schema:
       "id": "out-1",
       "timestamp": "00:00 - 04:00",
       "title": "Granular Chapter Title",
-      "summary": "Detailed technical summary",
-      "keyPoints": ["Point 1", "Point 2"],
+      "summary": "Detailed 4-8 sentence technical summary covering everything discussed",
+      "keyPoints": ["Point 1 with detail", "Point 2 with detail", "Point 3", "Point 4", "Point 5"],
       "codeSnippets": [
         {
           "language": "bash",
@@ -707,23 +734,23 @@ You MUST strictly return ONLY raw valid JSON matching this schema:
       "id": "fc-1",
       "topic": "Topic Name",
       "question": "Active recall question",
-      "answer": "Answer reasoning",
+      "answer": "Detailed answer with reasoning (3-4 sentences)",
       "difficulty": "Hard"
     }
   ],
   "quiz": [
     {
       "id": "qz-1",
-      "question": "Scenario question",
+      "question": "Scenario question testing deep understanding",
       "options": ["Option A", "Option B", "Option C", "Option D"],
       "correctOptionIndex": 0,
-      "explanation": "Rationale explanation",
+      "explanation": "Detailed rationale explanation (2-3 sentences)",
       "category": "Category"
     }
   ]
 }
 
-Provide rich technical detail and academic rigor for "${realTitle}".
+REMEMBER: Generate MAXIMUM content. Every concept, every example, every detail from "${realTitle}" must be captured. The detailedNotes field alone should be 3000-6000 words. Do NOT truncate or shorten anything.
 `;
 
   const ai = new GoogleGenerativeAI(apiKey.trim());
@@ -738,7 +765,8 @@ Provide rich technical detail and academic rigor for "${realTitle}".
         model: modelName,
         generationConfig: {
           responseMimeType: "application/json",
-          temperature: 0.2
+          temperature: 0.3,
+          maxOutputTokens: 65536
         }
       });
 
@@ -776,6 +804,9 @@ Provide rich technical detail and academic rigor for "${realTitle}".
         mindmap: parsedData.mindmap || { id: "root", label: realTitle },
         flashcards: parsedData.flashcards || [],
         quiz: parsedData.quiz || [],
+        detailedNotes: parsedData.detailedNotes || '',
+        vocabularyTerms: parsedData.vocabularyTerms || [],
+        formulasAndEquations: parsedData.formulasAndEquations || [],
         usageCost: {
           inputTokens,
           outputTokens,
