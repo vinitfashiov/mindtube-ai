@@ -1,5 +1,6 @@
 import React from 'react';
-import { PanelLeft, Sparkles, Plus } from 'lucide-react';
+import { PanelLeft, Sparkles, Plus, Coins } from 'lucide-react';
+import { ApiCostSummary } from '../types/cost';
 
 interface NavbarProps {
   apiKey: string;
@@ -15,22 +16,17 @@ interface NavbarProps {
   onToggleSidebar: () => void;
   isDesktop?: boolean;
   isSidebarOpen?: boolean;
+  apiCostSummary?: ApiCostSummary;
+  onOpenCostDashboard?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
-  apiKey: _apiKey,
-  onOpenApiKeyModal: _onOpenApiKeyModal,
-  onOpenHistory: _onOpenHistory,
-  onOpenChat: _onOpenChat,
-  onOpenPlaylistModal: _onOpenPlaylistModal,
-  historyCount: _historyCount,
-  onLoadSample: _onLoadSample,
   onNewChat,
-  currentLanguage: _currentLanguage,
-  onSelectLanguage: _onSelectLanguage,
   onToggleSidebar,
   isDesktop = false,
-  isSidebarOpen = true
+  isSidebarOpen = true,
+  apiCostSummary,
+  onOpenCostDashboard
 }) => {
   // On desktop, if sidebar is open, hide redundant header. If sidebar is collapsed, show toggle bar!
   if (isDesktop && isSidebarOpen) return null;
@@ -43,8 +39,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           onClick={onToggleSidebar}
           title={isSidebarOpen ? "Collapse Sidebar" : "Expand Sidebar"}
           style={{
-            width: 36,
-            height: 36,
+            width: 34,
+            height: 34,
             borderRadius: 10,
             background: '#ffffff',
             border: '1px solid #e4e4e7',
@@ -85,7 +81,35 @@ export const Navbar: React.FC<NavbarProps> = ({
       </div>
 
       {/* Right Actions & New Chat Button */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        {/* API Cost Badge Pill */}
+        {apiCostSummary && (
+          <button
+            onClick={onOpenCostDashboard}
+            title="View Detailed API Cost & Token Usage Breakdown"
+            style={{
+              padding: '5px 10px',
+              borderRadius: 9999,
+              background: '#f0fdf4',
+              border: '1px solid #bbf7d0',
+              color: '#15803d',
+              fontSize: 11.5,
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5,
+              cursor: 'pointer',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
+            }}
+          >
+            <Coins style={{ width: 13, height: 13, color: '#16a34a' }} />
+            <span>${apiCostSummary.totalCostUsd.toFixed(4)}</span>
+            <span style={{ fontSize: 10, padding: '1px 5px', borderRadius: 9999, background: '#dcfce7', color: '#166534' }}>
+              ₹{apiCostSummary.totalCostInr.toFixed(2)}
+            </span>
+          </button>
+        )}
+
         <button
           onClick={onNewChat}
           style={{
@@ -94,12 +118,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             background: '#eff6ff',
             border: '1px solid #dbeafe',
             color: '#2563eb',
-            fontSize: 12,
+            fontSize: 12.5,
             fontWeight: 700,
             display: 'flex',
             alignItems: 'center',
-            gap: 5,
-            boxShadow: '0 2px 6px rgba(37, 99, 235, 0.1)',
+            gap: 6,
             cursor: 'pointer'
           }}
         >

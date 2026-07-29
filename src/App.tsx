@@ -6,9 +6,11 @@ import { ChatGptSidebar } from './components/ChatGptSidebar';
 import { ClassNotesPdfView } from './components/ClassNotesPdfView';
 import { ChatWithVideoDrawer } from './components/ChatWithVideoDrawer';
 import { PlaylistInputModal } from './components/PlaylistInputModal';
+import { ApiCostDashboardModal } from './components/ApiCostDashboardModal';
 
 import { VideoNoteAnalysis, ChatSession, MasterChatMessage } from './types/notes';
-import { generateVideoAnalysis, translateAnalysis, chatWithMasterAi, SAMPLE_ANALYSIS } from './services/geminiService';
+import { ApiCostSummary, ApiUsageLog } from './types/cost';
+import { generateVideoAnalysis, translateAnalysis, chatWithMasterAiDetailed, SAMPLE_ANALYSIS } from './services/geminiService';
 
 export const App: React.FC = () => {
   const [apiKey, setApiKey] = useState<string>(() => {
@@ -78,6 +80,65 @@ export const App: React.FC = () => {
   const [isPdfModalOpen, setIsPdfModalOpen] = useState<boolean>(false);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
   const [isPlaylistModalOpen, setIsPlaylistModalOpen] = useState<boolean>(false);
+  const [isCostDashboardOpen, setIsCostDashboardOpen] = useState<boolean>(false);
+
+  // Real-Time API Cost Tracking State
+  const [apiCostSummary, setApiCostSummary] = useState<ApiCostSummary>(() => {
+    try {
+      const saved = localStorage.getItem('mindtube_api_cost_summary');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return {
+      totalCalls: 0,
+      totalInputTokens: 0,
+      totalOutputTokens: 0,
+      totalCostUsd: 0,
+      totalCostInr: 0,
+      logs: []
+    };
+  });
+
+  const recordApiUsage = (type: 'video_synthesis' | 'chat_qa' | 'translation', usage?: { inputTokens: number; outputTokens: number; costUsd: number; costInr: number }, details: string = '') => {
+    if (!usage) return;
+    setApiCostSummary((prev) => {
+      const newLog: ApiUsageLog = {
+        id: 'log-' + Date.now(),
+        type,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        model: 'gemini-2.5-flash',
+        inputTokens: usage.inputTokens,
+        outputTokens: usage.outputTokens,
+        costUsd: usage.costUsd,
+        costInr: usage.costInr,
+        details: details || type
+      };
+      const updated = {
+        totalCalls: prev.totalCalls + 1,
+        totalInputTokens: prev.totalInputTokens + usage.inputTokens,
+        totalOutputTokens: prev.totalOutputTokens + usage.outputTokens,
+        totalCostUsd: prev.totalCostUsd + usage.costUsd,
+        totalCostInr: prev.totalCostInr + usage.costInr,
+        logs: [newLog, ...prev.logs]
+      };
+      try {
+        localStorage.setItem('mindtube_api_cost_summary', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
+
+  const handleResetCostUsage = () => {
+    const fresh = {
+      totalCalls: 0,
+      totalInputTokens: 0,
+      totalOutputTokens: 0,
+      totalCostUsd: 0,
+      totalCostInr: 0,
+      logs: []
+    };
+    setApiCostSummary(fresh);
+    localStorage.removeItem('mindtube_api_cost_summary');
+  };
 
   // Sync sessions to localStorage
   useEffect(() => {
@@ -211,13 +272,17 @@ export const App: React.FC = () => {
       try {
         const result = await generateVideoAnalysis(query, apiKey, currentLanguage);
         setAnalysis(result);
+        if (result.usageCost) {
+          recordApiUsage('video_synthesis', result.usageCost, result.videoTitle);
+        }
 
         const cardMsg: MasterChatMessage = {
           id: 'card-' + Date.now(),
           sender: 'assistant',
           text: `✨ Master Class Notes PDF & Mindmap generated for: "${result.videoTitle}"`,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          analysisCard: result
+          analysisCard: result,
+          usageCost: result.usageCost
         };
 
         // Replace processing placeholder with finished Card
@@ -260,12 +325,17 @@ export const App: React.FC = () => {
       // General ChatGPT Reasoning Q&A
       setIsAiResponding(true);
       try {
-        const responseText = await chatWithMasterAi(query, activeSession?.analysis, apiKey, currentLanguage);
+        const res = await chatWithMasterAiDetailed(query, activeSession?.analysis, apiKey, currentLanguage);
+        if (res.usageCost) {
+          recordApiUsage('chat_qa', res.usageCost, query);
+        }
+
         const aiMsg: MasterChatMessage = {
           id: (Date.now() + 1).toString(),
           sender: 'assistant',
-          text: responseText,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          text: res.text,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          usageCost: res.usageCost
         };
 
         setSessions((prev) =>
@@ -318,6 +388,7 @@ export const App: React.FC = () => {
         onNewChat={handleNewChat}
         onOpenPlaylistModal={() => setIsPlaylistModalOpen(true)}
         onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)}
+        onOpenCostDashboard={() => setIsCostDashboardOpen(true)}
         currentLanguage={currentLanguage}
         onSelectLanguage={handleSelectLanguage}
         isDesktop={isDesktop}
@@ -340,6 +411,8 @@ export const App: React.FC = () => {
           onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
           isDesktop={isDesktop}
           isSidebarOpen={isSidebarOpen}
+          apiCostSummary={apiCostSummary}
+          onOpenCostDashboard={() => setIsCostDashboardOpen(true)}
         />
 
         {/* Main Content Workspace Container */}
@@ -402,6 +475,13 @@ export const App: React.FC = () => {
         onClose={() => setIsPlaylistModalOpen(false)}
         onAnalyzePlaylist={handleAnalyzePlaylist}
         isLoading={isLoading}
+      />
+
+      <ApiCostDashboardModal
+        summary={apiCostSummary}
+        isOpen={isCostDashboardOpen}
+        onClose={() => setIsCostDashboardOpen(false)}
+        onResetUsage={handleResetCostUsage}
       />
 
       {isPdfModalOpen && (analysis || SAMPLE_ANALYSIS) && (

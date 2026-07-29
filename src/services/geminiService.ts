@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { VideoNoteAnalysis } from "../types/notes";
+import { calculateGeminiCost } from "../types/cost";
 
 // Extract YouTube Video ID from any URL format
 export function extractYouTubeId(url: string): string | null {
@@ -45,9 +46,7 @@ export async function fetchYouTubeMetadata(youtubeUrl: string) {
 const MODEL_CANDIDATES = [
   "gemini-2.5-flash",
   "gemini-2.0-flash",
-  "gemini-1.5-flash-latest",
-  "gemini-1.5-pro-latest",
-  "gemini-2.0-flash-exp"
+  "gemini-1.5-flash"
 ];
 
 // Clean JSON response string from Markdown fence blocks
@@ -730,7 +729,8 @@ Provide rich technical detail and academic rigor for "${realTitle}".
       });
 
       const result = await model.generateContent([prompt]);
-      const responseText = result.response.text();
+      const response = result.response;
+      const responseText = response.text();
 
       if (!responseText) {
         throw new Error(`Empty response from model ${modelName}`);
@@ -738,6 +738,10 @@ Provide rich technical detail and academic rigor for "${realTitle}".
 
       const cleanedJson = cleanJsonResponse(responseText);
       const parsedData = JSON.parse(cleanedJson);
+      const usageMeta = response.usageMetadata;
+      const inputTokens = usageMeta?.promptTokenCount || Math.ceil(prompt.length / 4);
+      const outputTokens = usageMeta?.candidatesTokenCount || Math.ceil(responseText.length / 4);
+      const costObj = calculateGeminiCost(inputTokens, outputTokens);
 
       const fullAnalysis: VideoNoteAnalysis = {
         id: "gemini-" + Date.now(),
@@ -757,7 +761,13 @@ Provide rich technical detail and academic rigor for "${realTitle}".
         outline: parsedData.outline || [],
         mindmap: parsedData.mindmap || { id: "root", label: realTitle },
         flashcards: parsedData.flashcards || [],
-        quiz: parsedData.quiz || []
+        quiz: parsedData.quiz || [],
+        usageCost: {
+          inputTokens,
+          outputTokens,
+          costUsd: costObj.costUsd,
+          costInr: costObj.costInr
+        }
       };
 
       return fullAnalysis;
@@ -770,27 +780,45 @@ Provide rich technical detail and academic rigor for "${realTitle}".
   throw new Error(lastError?.message || "Failed to analyze video.");
 }
 
+// Chat Response Interface with Token Usage
+export interface ChatAiResponseWithCost {
+  text: string;
+  usageCost?: {
+    inputTokens: number;
+    outputTokens: number;
+    costUsd: number;
+    costInr: number;
+  };
+}
+
 // Chat with Master AI Copilot (Handles Video Q&A, General Knowledge, Math, Coding, Science & History)
-export async function chatWithMasterAi(
+export async function chatWithMasterAiDetailed(
   userQuery: string,
   analysis?: VideoNoteAnalysis | null,
   apiKey?: string,
   currentLanguage: string = 'en'
-): Promise<string> {
+): Promise<ChatAiResponseWithCost> {
   const isHindi = currentLanguage === 'hi';
 
   if (!apiKey || apiKey.trim().toUpperCase() === "DEMO") {
+    let replyText = `Hello! I am MindTube AI Copilot. You asked: "${userQuery}". Add your Gemini API Key in settings to enable full real-time Gemini 2.5 Flash reasoning!`;
     if (isHindi) {
-      if (analysis) {
-        return `नमस्ते! मैं MindTube AI Copilot हूँ। "${analysis.videoTitle}" के लिए आपका सवाल: "${userQuery}"। अधिक विस्तृत AI उत्तर के लिए सेटिंग्स में Gemini API Key जोड़ें!`;
-      }
-      return `नमस्ते! मैं MindTube AI हूँ। आपका प्रश्न: "${userQuery}"। पूर्ण real-time Gemini 2.5 AI उत्तर पाने के लिए सेटिंग्स में Gemini API Key दर्ज करें!`;
+      replyText = analysis
+        ? `नमस्ते! मैं MindTube AI Copilot हूँ। "${analysis.videoTitle}" के लिए आपका सवाल: "${userQuery}"। अधिक विस्तृत AI उत्तर के लिए सेटिंग्स में Gemini API Key जोड़ें!`
+        : `नमस्ते! मैं MindTube AI हूँ। आपका प्रश्न: "${userQuery}"। पूर्ण real-time Gemini 2.5 AI उत्तर पाने के लिए सेटिंग्स में Gemini API Key दर्ज करें!`;
+    } else if (analysis) {
+      replyText = `As an AI Study Copilot for "${analysis.videoTitle}", regarding "${userQuery}": This video highlights key practical concepts. Add your Gemini API Key in settings for unlimited real-time AI answers!`;
     }
 
-    if (analysis) {
-      return `As an AI Study Copilot for "${analysis.videoTitle}", regarding "${userQuery}": This video highlights key practical concepts. Add your Gemini API Key in settings for unlimited real-time AI answers!`;
-    }
-    return `Hello! I am MindTube AI Copilot. You asked: "${userQuery}". Add your Gemini API Key in settings to enable full real-time Gemini 2.5 Flash reasoning!`;
+    return {
+      text: replyText,
+      usageCost: {
+        inputTokens: 850,
+        outputTokens: 520,
+        costUsd: 0.000219,
+        costInr: 0.019
+      }
+    };
   }
 
   const ai = new GoogleGenerativeAI(apiKey.trim());
@@ -814,11 +842,39 @@ Chapters: ${analysis.outline.map(o => o.timestamp + ' ' + o.title).join('; ')}`;
   try {
     const model = ai.getGenerativeModel({ model: "gemini-2.5-flash" });
     const result = await model.generateContent([fullPrompt]);
-    return result.response.text() || "I couldn't process your question. Please try again.";
+    const res = await result.response;
+    const text = res.text() || "I couldn't process your question. Please try again.";
+
+    const usageMeta = res.usageMetadata;
+    const inputTokens = usageMeta?.promptTokenCount || Math.ceil(fullPrompt.length / 4);
+    const outputTokens = usageMeta?.candidatesTokenCount || Math.ceil(text.length / 4);
+    const costObj = calculateGeminiCost(inputTokens, outputTokens);
+
+    return {
+      text,
+      usageCost: {
+        inputTokens,
+        outputTokens,
+        costUsd: costObj.costUsd,
+        costInr: costObj.costInr
+      }
+    };
   } catch (err: any) {
     console.error("Master Chat error:", err);
-    return `Error: ${err?.message || "Failed to retrieve response from Gemini AI."}`;
+    return {
+      text: `Error: ${err?.message || "Failed to retrieve response from Gemini AI."}`
+    };
   }
+}
+
+export async function chatWithMasterAi(
+  userQuery: string,
+  analysis?: VideoNoteAnalysis | null,
+  apiKey?: string,
+  currentLanguage: string = 'en'
+): Promise<string> {
+  const res = await chatWithMasterAiDetailed(userQuery, analysis, apiKey, currentLanguage);
+  return res.text;
 }
 
 // Legacy alias

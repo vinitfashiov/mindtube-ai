@@ -20,7 +20,8 @@ import {
   ChevronLeft,
   ChevronRight,
   RotateCw,
-  Award
+  Award,
+  Coins
 } from 'lucide-react';
 import { VideoNoteAnalysis, MasterChatMessage } from '../types/notes';
 import { createSpeechRecognizer, speakNaturalVoice, stopSpeech } from '../services/voiceService';
@@ -421,6 +422,13 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
                     >
                       <Volume2 style={{ width: 14, height: 14 }} />
                     </button>
+                  )}
+
+                  {msg.usageCost && (
+                    <span style={{ fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 9999, background: '#f0fdf4', color: '#166534', border: '1px solid #bbf7d0', display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                      <Coins style={{ width: 10, height: 10 }} />
+                      ${msg.usageCost.costUsd.toFixed(4)} (₹{msg.usageCost.costInr.toFixed(2)})
+                    </span>
                   )}
                 </div>
 

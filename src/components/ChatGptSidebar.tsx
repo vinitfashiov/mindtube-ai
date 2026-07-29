@@ -8,7 +8,8 @@ import {
   X,
   User,
   MessageSquare,
-  PanelLeftClose
+  PanelLeftClose,
+  Coins
 } from 'lucide-react';
 import { ChatSession } from '../types/notes';
 
@@ -22,6 +23,7 @@ interface ChatGptSidebarProps {
   onNewChat: () => void;
   onOpenPlaylistModal: () => void;
   onOpenApiKeyModal: () => void;
+  onOpenCostDashboard?: () => void;
   currentLanguage: string;
   onSelectLanguage: (lang: string) => void;
   isDesktop?: boolean;
@@ -37,6 +39,7 @@ export const ChatGptSidebar: React.FC<ChatGptSidebarProps> = ({
   onNewChat,
   onOpenPlaylistModal,
   onOpenApiKeyModal,
+  onOpenCostDashboard,
   currentLanguage,
   onSelectLanguage,
   isDesktop = false
@@ -150,6 +153,29 @@ export const ChatGptSidebar: React.FC<ChatGptSidebarProps> = ({
           >
             <Key style={{ width: 16, height: 16, color: '#71717a' }} />
             <span>Gemini API Key</span>
+          </button>
+
+          <button
+            onClick={() => {
+              onOpenCostDashboard?.();
+              if (!isDesktop) onClose();
+            }}
+            style={{
+              padding: '8px 10px',
+              borderRadius: 8,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              fontSize: 13,
+              color: '#15803d',
+              fontWeight: 600,
+              background: '#f0fdf4',
+              border: '1px solid #bbf7d0',
+              cursor: 'pointer'
+            }}
+          >
+            <Coins style={{ width: 16, height: 16, color: '#16a34a' }} />
+            <span>API Cost & Analytics</span>
           </button>
 
           {/* Language Selector */}

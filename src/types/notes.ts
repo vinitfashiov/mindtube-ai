@@ -71,6 +71,12 @@ export interface VideoNoteAnalysis {
   trapsToAvoidGlobal?: string[];
   
   language?: string; // Current language (e.g. 'en', 'hi', 'es')
+  usageCost?: {
+    inputTokens: number;
+    outputTokens: number;
+    costUsd: number;
+    costInr: number;
+  };
 }
 
 export interface MasterChatMessage {
@@ -89,6 +95,12 @@ export interface MasterChatMessage {
   flashcardIndex?: number;
   isFlipped?: boolean;
   isProcessing?: boolean;
+  usageCost?: {
+    inputTokens: number;
+    outputTokens: number;
+    costUsd: number;
+    costInr: number;
+  };
 }
 
 export interface ChatSession {
