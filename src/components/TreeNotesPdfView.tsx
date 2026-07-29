@@ -18,41 +18,42 @@ interface TreeNotesPdfViewProps {
   onSwitchStyle?: (style: 'handbook' | 'tree') => void;
 }
 
-// Render individual tree node matching exact Revisemap target styling (Image 1)
-const RenderRevisemapNode: React.FC<{ node: RevisemapTreeNode; depth?: number }> = ({ node, depth = 0 }) => {
+// Precise Recursive Renderer with Nested Vertical Guidelines matching Target Screenshots
+const RenderRevisemapBranch: React.FC<{ node: RevisemapTreeNode; depth?: number }> = ({ node, depth = 0 }) => {
   if (!node || !node.title) return null;
 
   const title = node.title.trim();
   const details = node.details ? node.details.trim() : '';
 
-  // Determine badge styling based on title keywords or depth
+  // Classify badge types matching exact Revisemap color system
   const isTopTopic = depth === 0 || title.includes('(Reproduction)') || node.badgeType === 'topic';
-  const isPurpleSection = title.includes('नर जनन तंत्र') || title.includes('मादा जनन तंत्र') || title.includes('प्रजनन तंत्र') || node.badgeType === 'section_purple';
-  const isGreenBadge = title.includes('विशेषताएं') || title.includes('विधियाँ') || title.includes('मासिक चक्र') || node.badgeType === 'badge_green';
-  const isBrownBadge = title.includes('किन में होता है') || title.includes('परिभाषा') || title.includes('महत्व') || title.includes('प्रकार') || title.includes('कार्य') || title.includes('स्थिति') || title.includes('स्रोत') || node.badgeType === 'badge_brown';
+  const isPurpleBadge = title.includes('परिभाषा') || title.includes('महत्व') || title.includes('प्रकार') || title.includes('नर जनन तंत्र') || title.includes('मादा जनन तंत्र') || title.includes('प्रजनन तंत्र') || title.includes('अपरा') || title.includes('हॉर्मोनल गोलियां') || node.badgeType === 'section_purple';
+  const isGreenBadge = title.includes('विशेषताएं') || title.includes('विधियाँ') || title.includes('मासिक चक्र') || title.includes('अस्थाई विधि') || title.includes('प्रक्रियों') || node.badgeType === 'badge_green';
+  const isBrownBadge = title.includes('किन में होता है') || title.includes('कार्य') || title.includes('स्थिति') || title.includes('स्रोत') || title.includes('प्रजनन की प्रक्रिया') || node.badgeType === 'badge_brown';
   const isGreenTitle = title.includes('(Regeneration)') || title.includes('(Budding)') || title.includes('(Spore Formation)') || title.includes('(Vegetative') || title.includes('(Fragmentation)');
+  const isPurpleTitle = title.includes('हॉर्मोन और उनका कार्य') || title.includes('मानव पुरुष जनन तंत्र') || title.includes('मादा प्रजनन तंत्र') || title.includes('सगर्भता') || title.includes('गर्भनिरोधक विधियाँ') || title.includes('स्थाई विधि');
 
-  // 1. Top Topic Box (Dark Olive/Brown Box + Yellow/Gold Border)
+  // 1. Top Level Root Box (Dark Olive + Gold Border)
   if (isTopTopic) {
     return (
       <div style={{ marginBottom: 8 }}>
         <div style={{
-          background: '#3f3724',
+          background: '#3e3527',
           color: '#ffffff',
-          border: '2px solid #b5a642',
+          border: '2px solid #ca8a04',
           padding: '3px 8px',
           fontSize: 12,
           fontWeight: 800,
-          borderRadius: 2,
+          borderRadius: 3,
           display: 'inline-block',
           marginBottom: 3
         }}>
           {title} {details ? `(${details})` : ''}
         </div>
         {node.children && node.children.length > 0 && (
-          <div style={{ paddingLeft: 4, borderLeft: '1px solid #008080', marginLeft: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <div style={{ paddingLeft: 6, borderLeft: '1.5px solid #0d9488', marginLeft: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
             {node.children.map((child, cIdx) => (
-              <RenderRevisemapNode key={cIdx} node={child} depth={depth + 1} />
+              <RenderRevisemapBranch key={cIdx} node={child} depth={depth + 1} />
             ))}
           </div>
         )}
@@ -60,32 +61,32 @@ const RenderRevisemapNode: React.FC<{ node: RevisemapTreeNode; depth?: number }>
     );
   }
 
-  // 2. Purple Section Box (e.g. नर जनन तंत्र, मादा जनन तंत्र)
-  if (isPurpleSection) {
+  // 2. Purple Badge (Deep Purple + Gold Border)
+  if (isPurpleBadge) {
     return (
-      <div style={{ marginTop: 6, marginBottom: 4 }}>
+      <div style={{ marginTop: 4, marginBottom: 3 }}>
         <div style={{
-          background: '#4a154b',
+          background: '#581c87',
           color: '#ffffff',
-          border: '1.5px solid #a855f7',
+          border: '1.5px solid #facc15',
           padding: '2px 7px',
-          fontSize: 11.5,
+          fontSize: 11,
           fontWeight: 800,
           borderRadius: 2,
           display: 'inline-block',
-          marginBottom: 3
+          marginBottom: 2
         }}>
           {title}
         </div>
         {details && (
-          <div style={{ fontSize: 11, color: '#1d4ed8', paddingLeft: 4, marginBottom: 2 }}>
+          <div style={{ fontSize: 10.5, color: '#1d4ed8', paddingLeft: 4, marginBottom: 2 }}>
             |_ {details}
           </div>
         )}
         {node.children && node.children.length > 0 && (
-          <div style={{ paddingLeft: 4, borderLeft: '1px solid #008080', marginLeft: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <div style={{ paddingLeft: 6, borderLeft: '1.5px solid #0d9488', marginLeft: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
             {node.children.map((child, cIdx) => (
-              <RenderRevisemapNode key={cIdx} node={child} depth={depth + 1} />
+              <RenderRevisemapBranch key={cIdx} node={child} depth={depth + 1} />
             ))}
           </div>
         )}
@@ -93,7 +94,7 @@ const RenderRevisemapNode: React.FC<{ node: RevisemapTreeNode; depth?: number }>
     );
   }
 
-  // 3. Green Feature/Method Badge (e.g. विशेषताएं, विधियाँ)
+  // 3. Green Badge (Forest Green + Light Green Border)
   if (isGreenBadge) {
     return (
       <div style={{ marginTop: 4, marginBottom: 3 }}>
@@ -116,9 +117,9 @@ const RenderRevisemapNode: React.FC<{ node: RevisemapTreeNode; depth?: number }>
           </div>
         )}
         {node.children && node.children.length > 0 && (
-          <div style={{ paddingLeft: 4, borderLeft: '1px solid #008080', marginLeft: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <div style={{ paddingLeft: 6, borderLeft: '1.5px solid #0d9488', marginLeft: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
             {node.children.map((child, cIdx) => (
-              <RenderRevisemapNode key={cIdx} node={child} depth={depth + 1} />
+              <RenderRevisemapBranch key={cIdx} node={child} depth={depth + 1} />
             ))}
           </div>
         )}
@@ -126,14 +127,14 @@ const RenderRevisemapNode: React.FC<{ node: RevisemapTreeNode; depth?: number }>
     );
   }
 
-  // 4. Dark Brown Attribute Pill (e.g. किन में होता है, कार्य, स्थिति)
+  // 4. Dark Brown Pill (Dark Brown + Gold Border)
   if (isBrownBadge) {
     return (
       <div style={{ marginTop: 3, marginBottom: 2 }}>
         <div style={{
-          background: '#4a2c11',
-          color: '#fde047',
-          border: '1px solid #fef08a',
+          background: '#451a03',
+          color: '#fef08a',
+          border: '1.5px solid #fde047',
           padding: '1px 5px',
           fontSize: 10.5,
           fontWeight: 700,
@@ -149,9 +150,9 @@ const RenderRevisemapNode: React.FC<{ node: RevisemapTreeNode; depth?: number }>
           </div>
         )}
         {node.children && node.children.length > 0 && (
-          <div style={{ paddingLeft: 4, borderLeft: '1px solid #008080', marginLeft: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <div style={{ paddingLeft: 6, borderLeft: '1.5px solid #0d9488', marginLeft: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
             {node.children.map((child, cIdx) => (
-              <RenderRevisemapNode key={cIdx} node={child} depth={depth + 1} />
+              <RenderRevisemapBranch key={cIdx} node={child} depth={depth + 1} />
             ))}
           </div>
         )}
@@ -159,7 +160,7 @@ const RenderRevisemapNode: React.FC<{ node: RevisemapTreeNode; depth?: number }>
     );
   }
 
-  // 5. Green Subtopic Title (e.g. पुनर्जनन (Regeneration))
+  // 5. Green Subtopic Title
   if (isGreenTitle) {
     return (
       <div style={{ marginTop: 4, marginBottom: 2 }}>
@@ -172,9 +173,9 @@ const RenderRevisemapNode: React.FC<{ node: RevisemapTreeNode; depth?: number }>
           </div>
         )}
         {node.children && node.children.length > 0 && (
-          <div style={{ paddingLeft: 4, borderLeft: '1px solid #008080', marginLeft: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <div style={{ paddingLeft: 6, borderLeft: '1.5px solid #0d9488', marginLeft: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
             {node.children.map((child, cIdx) => (
-              <RenderRevisemapNode key={cIdx} node={child} depth={depth + 1} />
+              <RenderRevisemapBranch key={cIdx} node={child} depth={depth + 1} />
             ))}
           </div>
         )}
@@ -182,7 +183,30 @@ const RenderRevisemapNode: React.FC<{ node: RevisemapTreeNode; depth?: number }>
     );
   }
 
-  // 6. Subtopic Title (Blue text e.g. अलैंगिक जनन, द्विविखंडन)
+  // 6. Purple Subtopic Title
+  if (isPurpleTitle) {
+    return (
+      <div style={{ marginTop: 4, marginBottom: 2 }}>
+        <div style={{ fontSize: 11.5, fontWeight: 800, color: '#7e22ce' }}>
+          {title}
+        </div>
+        {details && (
+          <div style={{ fontSize: 10.5, color: '#1e293b', paddingLeft: 4 }}>
+            |_ {details}
+          </div>
+        )}
+        {node.children && node.children.length > 0 && (
+          <div style={{ paddingLeft: 6, borderLeft: '1.5px solid #0d9488', marginLeft: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {node.children.map((child, cIdx) => (
+              <RenderRevisemapBranch key={cIdx} node={child} depth={depth + 1} />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // 7. Blue Subtopic Title (with children)
   if (node.children && node.children.length > 0) {
     return (
       <div style={{ marginTop: 3, marginBottom: 2 }}>
@@ -194,20 +218,20 @@ const RenderRevisemapNode: React.FC<{ node: RevisemapTreeNode; depth?: number }>
             |_ {details}
           </div>
         )}
-        <div style={{ paddingLeft: 4, borderLeft: '1px solid #008080', marginLeft: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <div style={{ paddingLeft: 6, borderLeft: '1.5px solid #0d9488', marginLeft: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
           {node.children.map((child, cIdx) => (
-            <RenderRevisemapNode key={cIdx} node={child} depth={depth + 1} />
+            <RenderRevisemapBranch key={cIdx} node={child} depth={depth + 1} />
           ))}
         </div>
       </div>
     );
   }
 
-  // 7. Standard Tree Leaf Item (|_ text)
+  // 8. Standard Tree Leaf Node (|_ text)
   return (
     <div style={{ fontSize: 10.5, color: '#1e293b', lineHeight: 1.45, marginTop: 1, paddingLeft: 2 }}>
       <div style={{ display: 'flex', gap: 3, alignItems: 'flex-start' }}>
-        <span style={{ color: '#1d4ed8', fontWeight: 'bold', fontFamily: 'monospace', flexShrink: 0 }}>|_</span>
+        <span style={{ color: '#0d9488', fontWeight: 'bold', fontFamily: 'monospace', flexShrink: 0 }}>|_</span>
         <div>
           <span>{title}</span>
           {details && <span style={{ color: '#475569', marginLeft: 3 }}>— {details}</span>}
@@ -268,16 +292,15 @@ export const TreeNotesPdfView: React.FC<TreeNotesPdfViewProps> = ({
     }
   };
 
-  // Build Exhaustive Tree matching Target Image 1
+  // Synthesize tree nodes from all available content to ensure 100% video density
   const treeNodes: RevisemapTreeNode[] = React.useMemo(() => {
     if (analysis.revisemapTree && analysis.revisemapTree.length > 0) {
       return analysis.revisemapTree;
     }
 
-    // Synthesize exhaustive nodes from outline, keyTakeaways, and vocabulary
     const synthesized: RevisemapTreeNode[] = [];
 
-    // Main Topic Root Box
+    // Main Topic Box
     synthesized.push({
       title: analysis.videoTitle,
       badgeType: 'topic',
@@ -303,7 +326,7 @@ export const TreeNotesPdfView: React.FC<TreeNotesPdfViewProps> = ({
 
     if (analysis.keyTakeaways && analysis.keyTakeaways.length > 0) {
       synthesized.push({
-        title: 'महत्वपूर्ण नियम & Exam Facts',
+        title: 'महत्वपूर्ण नियम (Exam Principles)',
         badgeType: 'badge_green',
         children: analysis.keyTakeaways.map((kt) => ({
           title: kt.title,
@@ -473,7 +496,7 @@ export const TreeNotesPdfView: React.FC<TreeNotesPdfViewProps> = ({
         </div>
       </div>
 
-      {/* ==================== REVISEMAP TARGET PDF (IMAGE 1 EXACT RECREATION) ==================== */}
+      {/* ==================== REVISEMAP TARGET PDF (EXACT IMAGE MATCH) ==================== */}
       <div
         ref={pdfContentRef}
         style={{
@@ -482,7 +505,7 @@ export const TreeNotesPdfView: React.FC<TreeNotesPdfViewProps> = ({
           margin: '0 auto 40px auto',
           background: themeMode === 'light' ? '#ffffff' : '#090d16',
           color: themeMode === 'light' ? '#0f172a' : '#f8fafc',
-          border: '2px solid #008080',
+          border: '3px solid #0d9488',
           padding: 4,
           borderRadius: 4,
           boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
@@ -490,8 +513,25 @@ export const TreeNotesPdfView: React.FC<TreeNotesPdfViewProps> = ({
           position: 'relative'
         }}
       >
-        <div style={{ border: '1px solid #008080', padding: '12px 10px', borderRadius: 2 }}>
-          {/* REVISEMAP HEADER BANNER WITH RED IMAGE PATTERN */}
+        <div style={{ border: '1px solid #0d9488', padding: '12px 10px', borderRadius: 2, background: '#ffffff', position: 'relative' }}>
+          
+          {/* REVISEMAP WATERMARK IN BACKGROUND */}
+          <div style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%) rotate(-25deg)',
+            fontSize: 70,
+            fontWeight: 900,
+            color: 'rgba(13, 148, 136, 0.04)',
+            pointerEvents: 'none',
+            whiteSpace: 'nowrap',
+            zIndex: 0
+          }}>
+            revisemap.com
+          </div>
+
+          {/* REVISEMAP HEADER BANNER WITH RED PATTERN */}
           <div style={{
             background: 'linear-gradient(135deg, #7f1d1d 0%, #991b1b 50%, #7f1d1d 100%)',
             color: '#ffffff',
@@ -499,6 +539,8 @@ export const TreeNotesPdfView: React.FC<TreeNotesPdfViewProps> = ({
             padding: '16px 20px',
             borderRadius: 4,
             marginBottom: 14,
+            position: 'relative',
+            zIndex: 1,
             boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
           }}>
             <h1 style={{ fontSize: 36, fontWeight: 900, textTransform: 'none', letterSpacing: 0.5, margin: 0, fontFamily: 'Georgia, serif', color: '#ffffff' }}>
@@ -509,46 +551,48 @@ export const TreeNotesPdfView: React.FC<TreeNotesPdfViewProps> = ({
             </div>
           </div>
 
-          {/* DENSE 4-COLUMN TREE GRID WITH DIVIDER LINES */}
+          {/* DENSE 4-COLUMN TREE GRID WITH Teal DIVIDER LINES */}
           <div style={{
             display: 'grid',
             gridTemplateColumns: window.innerWidth < 768 ? '1fr' : 'repeat(4, 1fr)',
             gap: 8,
             minHeight: 700,
-            alignItems: 'start'
+            alignItems: 'start',
+            position: 'relative',
+            zIndex: 1
           }}>
             {/* COLUMN 1 */}
-            <div style={{ borderRight: window.innerWidth >= 768 ? '1px solid #008080' : 'none', paddingRight: 6 }}>
+            <div style={{ borderRight: window.innerWidth >= 768 ? '1.5px solid #0d9488' : 'none', paddingRight: 6 }}>
               {col1.map((node, nIdx) => (
-                <RenderRevisemapNode key={nIdx} node={node} depth={0} />
+                <RenderRevisemapBranch key={nIdx} node={node} depth={0} />
               ))}
             </div>
 
             {/* COLUMN 2 */}
-            <div style={{ borderRight: window.innerWidth >= 768 ? '1px solid #008080' : 'none', paddingRight: 6, paddingLeft: 4 }}>
+            <div style={{ borderRight: window.innerWidth >= 768 ? '1.5px solid #0d9488' : 'none', paddingRight: 6, paddingLeft: 4 }}>
               {col2.map((node, nIdx) => (
-                <RenderRevisemapNode key={nIdx} node={node} depth={0} />
+                <RenderRevisemapBranch key={nIdx} node={node} depth={0} />
               ))}
             </div>
 
             {/* COLUMN 3 */}
-            <div style={{ borderRight: window.innerWidth >= 768 ? '1px solid #008080' : 'none', paddingRight: 6, paddingLeft: 4 }}>
+            <div style={{ borderRight: window.innerWidth >= 768 ? '1.5px solid #0d9488' : 'none', paddingRight: 6, paddingLeft: 4 }}>
               {col3.map((node, nIdx) => (
-                <RenderRevisemapNode key={nIdx} node={node} depth={0} />
+                <RenderRevisemapBranch key={nIdx} node={node} depth={0} />
               ))}
             </div>
 
             {/* COLUMN 4 */}
             <div style={{ paddingLeft: 4 }}>
               {col4.map((node, nIdx) => (
-                <RenderRevisemapNode key={nIdx} node={node} depth={0} />
+                <RenderRevisemapBranch key={nIdx} node={node} depth={0} />
               ))}
             </div>
           </div>
 
           {/* FOOTER BANNER */}
           <div style={{
-            background: '#008080',
+            background: '#0d9488',
             color: '#ffffff',
             textAlign: 'center',
             padding: '6px 14px',
@@ -558,11 +602,14 @@ export const TreeNotesPdfView: React.FC<TreeNotesPdfViewProps> = ({
             borderRadius: 2,
             display: 'flex',
             justifyContent: 'space-between',
-            alignItems: 'center'
+            alignItems: 'center',
+            position: 'relative',
+            zIndex: 1
           }}>
             <span>revisemap.com</span>
             <span>This is a class notes pdf. It may contains class info. [Not for sale]</span>
           </div>
+
         </div>
       </div>
     </div>
