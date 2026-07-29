@@ -586,7 +586,8 @@ export const SAMPLE_ANALYSIS: VideoNoteAnalysis = {
 export async function generateVideoAnalysis(
   youtubeUrl: string,
   apiKey: string,
-  targetLanguage: string = 'en'
+  targetLanguage: string = 'en',
+  customModel: string = 'gemini-2.5-flash-lite'
 ): Promise<VideoNoteAnalysis> {
   const videoId = extractYouTubeId(youtubeUrl);
   if (!videoId) {
@@ -718,7 +719,9 @@ Provide rich technical detail and academic rigor for "${realTitle}".
   const ai = new GoogleGenerativeAI(apiKey.trim());
   let lastError: any = null;
 
-  for (const modelName of MODEL_CANDIDATES) {
+  const candidates = Array.from(new Set([customModel, ...MODEL_CANDIDATES]));
+
+  for (const modelName of candidates) {
     try {
       console.log(`Attempting Gemini request with model: ${modelName} for "${realTitle}"`);
       const model = ai.getGenerativeModel({
@@ -797,7 +800,8 @@ export async function chatWithMasterAiDetailed(
   userQuery: string,
   analysis?: VideoNoteAnalysis | null,
   apiKey?: string,
-  currentLanguage: string = 'en'
+  currentLanguage: string = 'en',
+  customModel: string = 'gemini-2.5-flash-lite'
 ): Promise<ChatAiResponseWithCost> {
   const isHindi = currentLanguage === 'hi';
 
@@ -839,33 +843,39 @@ Chapters: ${analysis.outline.map(o => o.timestamp + ' ' + o.title).join('; ')}`;
   }
 
   const fullPrompt = `${systemPrompt}\n\nUser Prompt: "${userQuery}"\n\nProvide a comprehensive, beautifully structured answer.`;
+  const candidates = Array.from(new Set([customModel, ...MODEL_CANDIDATES]));
+  let lastErr: any = null;
 
-  try {
-    const model = ai.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
-    const result = await model.generateContent([fullPrompt]);
-    const res = await result.response;
-    const text = res.text() || "I couldn't process your question. Please try again.";
+  for (const modelName of candidates) {
+    try {
+      const model = ai.getGenerativeModel({ model: modelName });
+      const result = await model.generateContent([fullPrompt]);
+      const res = await result.response;
+      const text = res.text() || "I couldn't process your question. Please try again.";
 
-    const usageMeta = res.usageMetadata;
-    const inputTokens = usageMeta?.promptTokenCount || Math.ceil(fullPrompt.length / 4);
-    const outputTokens = usageMeta?.candidatesTokenCount || Math.ceil(text.length / 4);
-    const costObj = calculateGeminiCost(inputTokens, outputTokens);
+      const usageMeta = res.usageMetadata;
+      const inputTokens = usageMeta?.promptTokenCount || Math.ceil(fullPrompt.length / 4);
+      const outputTokens = usageMeta?.candidatesTokenCount || Math.ceil(text.length / 4);
+      const costObj = calculateGeminiCost(inputTokens, outputTokens);
 
-    return {
-      text,
-      usageCost: {
-        inputTokens,
-        outputTokens,
-        costUsd: costObj.costUsd,
-        costInr: costObj.costInr
-      }
-    };
-  } catch (err: any) {
-    console.error("Master Chat error:", err);
-    return {
-      text: `Error: ${err?.message || "Failed to retrieve response from Gemini AI."}`
-    };
+      return {
+        text,
+        usageCost: {
+          inputTokens,
+          outputTokens,
+          costUsd: costObj.costUsd,
+          costInr: costObj.costInr
+        }
+      };
+    } catch (err: any) {
+      console.warn(`Chat model ${modelName} failed:`, err);
+      lastErr = err;
+    }
   }
+
+  return {
+    text: `Error: ${lastErr?.message || "Failed to retrieve response from Gemini AI."}`
+  };
 }
 
 export async function chatWithMasterAi(

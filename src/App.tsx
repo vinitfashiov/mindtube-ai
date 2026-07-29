@@ -7,6 +7,7 @@ import { ClassNotesPdfView } from './components/ClassNotesPdfView';
 import { ChatWithVideoDrawer } from './components/ChatWithVideoDrawer';
 import { PlaylistInputModal } from './components/PlaylistInputModal';
 import { ApiCostDashboardModal } from './components/ApiCostDashboardModal';
+import { SettingsModal } from './components/SettingsModal';
 
 import { VideoNoteAnalysis, ChatSession, MasterChatMessage } from './types/notes';
 import { ApiCostSummary, ApiUsageLog } from './types/cost';
@@ -15,6 +16,15 @@ import { generateVideoAnalysis, translateAnalysis, chatWithMasterAiDetailed, SAM
 export const App: React.FC = () => {
   const [apiKey, setApiKey] = useState<string>(() => {
     return localStorage.getItem('mindtube_gemini_key') || '';
+  });
+
+  const [selectedModel, setSelectedModel] = useState<string>(() => {
+    return localStorage.getItem('mindtube_selected_model') || 'gemini-2.5-flash-lite';
+  });
+
+  const [defaultQuizQty, setDefaultQuizQty] = useState<number>(() => {
+    const saved = localStorage.getItem('mindtube_default_quiz_qty');
+    return saved ? parseInt(saved, 10) : 10;
   });
 
   // Responsive desktop detection
@@ -58,15 +68,9 @@ export const App: React.FC = () => {
     return [freshSession];
   });
 
-  const [activeSessionId, setActiveSessionId] = useState<string>(() => {
-    const saved = localStorage.getItem('mindtube_chat_sessions');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (parsed.length > 0) return parsed[0].id;
-      } catch {}
-    }
-    return '';
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(() => {
+    if (sessions.length > 0) return sessions[0].id;
+    return null;
   });
 
   const [analysis, setAnalysis] = useState<VideoNoteAnalysis | null>(null);
@@ -81,6 +85,34 @@ export const App: React.FC = () => {
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
   const [isPlaylistModalOpen, setIsPlaylistModalOpen] = useState<boolean>(false);
   const [isCostDashboardOpen, setIsCostDashboardOpen] = useState<boolean>(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState<boolean>(false);
+
+  const handleSelectModel = (modelId: string) => {
+    setSelectedModel(modelId);
+    localStorage.setItem('mindtube_selected_model', modelId);
+  };
+
+  const handleSelectQuizQty = (qty: number) => {
+    setDefaultQuizQty(qty);
+    localStorage.setItem('mindtube_default_quiz_qty', qty.toString());
+  };
+
+  const handleClearAllData = () => {
+    localStorage.clear();
+    setSessions([]);
+    setActiveSessionId(null);
+    setAnalysis(null);
+    setApiKey('');
+    setSelectedModel('gemini-2.5-flash-lite');
+    setApiCostSummary({
+      totalCalls: 0,
+      totalInputTokens: 0,
+      totalOutputTokens: 0,
+      totalCostUsd: 0,
+      totalCostInr: 0,
+      logs: []
+    });
+  };
 
   // Real-Time API Cost Tracking State
   const [apiCostSummary, setApiCostSummary] = useState<ApiCostSummary>(() => {
@@ -270,7 +302,7 @@ export const App: React.FC = () => {
       setErrorMsg(null);
 
       try {
-        const result = await generateVideoAnalysis(query, apiKey, currentLanguage);
+        const result = await generateVideoAnalysis(query, apiKey, currentLanguage, selectedModel);
         setAnalysis(result);
         if (result.usageCost) {
           recordApiUsage('video_synthesis', result.usageCost, result.videoTitle);
@@ -325,7 +357,7 @@ export const App: React.FC = () => {
       // General ChatGPT Reasoning Q&A
       setIsAiResponding(true);
       try {
-        const res = await chatWithMasterAiDetailed(query, activeSession?.analysis, apiKey, currentLanguage);
+        const res = await chatWithMasterAiDetailed(query, activeSession?.analysis, apiKey, currentLanguage, selectedModel);
         if (res.usageCost) {
           recordApiUsage('chat_qa', res.usageCost, query);
         }
@@ -387,8 +419,10 @@ export const App: React.FC = () => {
         onDeleteSession={handleDeleteSession}
         onNewChat={handleNewChat}
         onOpenPlaylistModal={() => setIsPlaylistModalOpen(true)}
-        onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)}
+        onOpenApiKeyModal={() => setIsSettingsModalOpen(true)}
         onOpenCostDashboard={() => setIsCostDashboardOpen(true)}
+        onOpenSettings={() => setIsSettingsModalOpen(true)}
+        selectedModel={selectedModel}
         currentLanguage={currentLanguage}
         onSelectLanguage={handleSelectLanguage}
         isDesktop={isDesktop}
@@ -399,7 +433,7 @@ export const App: React.FC = () => {
         {/* Top Header Bar */}
         <Navbar
           apiKey={apiKey}
-          onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)}
+          onOpenApiKeyModal={() => setIsSettingsModalOpen(true)}
           onOpenHistory={() => setIsSidebarOpen(true)}
           onOpenChat={() => setIsChatOpen(true)}
           onOpenPlaylistModal={() => setIsPlaylistModalOpen(true)}
@@ -468,6 +502,20 @@ export const App: React.FC = () => {
         onClose={() => setIsApiKeyModalOpen(false)}
         apiKey={apiKey}
         onSaveApiKey={handleSaveApiKey}
+      />
+
+      <SettingsModal
+        isOpen={isSettingsModalOpen}
+        onClose={() => setIsSettingsModalOpen(false)}
+        apiKey={apiKey}
+        onSaveApiKey={handleSaveApiKey}
+        selectedModel={selectedModel}
+        onSelectModel={handleSelectModel}
+        currentLanguage={currentLanguage}
+        onSelectLanguage={setCurrentLanguage}
+        defaultQuizQty={defaultQuizQty}
+        onSelectQuizQty={handleSelectQuizQty}
+        onClearAllData={handleClearAllData}
       />
 
       <PlaylistInputModal

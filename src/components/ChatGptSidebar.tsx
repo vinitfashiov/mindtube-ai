@@ -9,7 +9,8 @@ import {
   User,
   MessageSquare,
   PanelLeftClose,
-  Coins
+  Coins,
+  Settings
 } from 'lucide-react';
 import { ChatSession } from '../types/notes';
 
@@ -24,6 +25,8 @@ interface ChatGptSidebarProps {
   onOpenPlaylistModal: () => void;
   onOpenApiKeyModal: () => void;
   onOpenCostDashboard?: () => void;
+  onOpenSettings?: () => void;
+  selectedModel?: string;
   currentLanguage: string;
   onSelectLanguage: (lang: string) => void;
   isDesktop?: boolean;
@@ -40,6 +43,8 @@ export const ChatGptSidebar: React.FC<ChatGptSidebarProps> = ({
   onOpenPlaylistModal,
   onOpenApiKeyModal,
   onOpenCostDashboard,
+  onOpenSettings,
+  selectedModel,
   currentLanguage,
   onSelectLanguage,
   isDesktop = false
@@ -255,30 +260,56 @@ export const ChatGptSidebar: React.FC<ChatGptSidebarProps> = ({
         )}
       </div>
 
-      {/* User Account Footer */}
-      <div style={{ borderTop: '1px solid #f4f4f5', paddingTop: 12, display: 'flex', alignItems: 'center', gap: 10 }}>
-        <div style={{
-          width: 32,
-          height: 32,
-          borderRadius: '50%',
-          background: '#eff6ff',
-          border: '1px solid #dbeafe',
-          color: '#2563eb',
+      {/* User Account Footer & Settings Trigger */}
+      <div
+        onClick={() => {
+          onOpenSettings?.();
+          if (!isDesktop) onClose();
+        }}
+        style={{
+          borderTop: '1px solid #f4f4f5',
+          paddingTop: 10,
+          paddingBottom: 4,
+          paddingLeft: 6,
+          paddingRight: 6,
+          borderRadius: 12,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: 13,
-          fontWeight: 700
-        }}>
-          <User style={{ width: 16, height: 16 }} />
+          justifyContent: 'space-between',
+          cursor: 'pointer',
+          transition: 'background 0.15s ease'
+        }}
+        className="sidebar-recent-item"
+        title="Open Settings & Preferences"
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{
+            width: 32,
+            height: 32,
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #2563eb, #4f46e5)',
+            color: '#ffffff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 13,
+            fontWeight: 700,
+            boxShadow: '0 2px 8px rgba(37, 99, 235, 0.25)'
+          }}>
+            <User style={{ width: 16, height: 16 }} />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: '#09090b', lineHeight: 1.1 }}>
+              Student User
+            </span>
+            <span style={{ fontSize: 11, color: '#2563eb', fontWeight: 600, marginTop: 2 }}>
+              Plus • {selectedModel || 'Gemini 2.5 Flash Lite'}
+            </span>
+          </div>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: '#09090b', lineHeight: 1.1 }}>
-            Student User
-          </span>
-          <span style={{ fontSize: 11, color: '#71717a' }}>
-            Plus • Gemini 2.5
-          </span>
+
+        <div style={{ width: 28, height: 28, borderRadius: 8, background: '#f4f4f5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#52525b' }}>
+          <Settings style={{ width: 15, height: 15 }} />
         </div>
       </div>
     </div>
