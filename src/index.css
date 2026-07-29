@@ -158,6 +158,14 @@ button {
 }
 
 @media (max-width: 640px) {
+  .hero-scroll-container {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+    padding-top: 28vh !important;
+    padding-bottom: 12px !important;
+  }
+
   .agent-header {
     padding: 6px 12px !important;
   }
