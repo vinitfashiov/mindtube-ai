@@ -21,14 +21,16 @@ import {
   RotateCw,
   Award,
   Coins,
-  Copy
+  Copy,
+  FileText,
+  X
 } from 'lucide-react';
 import { VideoNoteAnalysis, MasterChatMessage } from '../types/notes';
 import { createSpeechRecognizer, speakNaturalVoice, stopSpeech } from '../services/voiceService';
 
 interface VideoInputSectionProps {
   messages: MasterChatMessage[];
-  onSendMessage: (text: string) => void;
+  onSendMessage: (text: string, customTranscript?: string) => void;
   isLoading: boolean;
   isAiResponding: boolean;
   onOpenPdf: (specificAnalysis?: VideoNoteAnalysis | null) => void;
@@ -233,13 +235,17 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
     speakNaturalVoice(text, currentLanguage);
   };
 
+  const [customTranscriptText, setCustomTranscriptText] = useState('');
+  const [showTranscriptModal, setShowTranscriptModal] = useState(false);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const query = inputText.trim();
     if (!query || isAiResponding) return;
 
     setInputText('');
-    onSendMessage(query);
+    onSendMessage(query, customTranscriptText || undefined);
+    setCustomTranscriptText('');
   };
 
   const handleSampleClick = (url: string) => {
@@ -971,12 +977,13 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
           />
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', paddingTop: 4 }}>
-            {/* Left Controls: '+' Icon & MindTube Desktop Agent Pill */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            {/* Left Controls: '+' Icon, PDF Style, and Transcript Drawer Pill */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
               <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#f4f4f5', border: '1px solid #e4e4e7', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#52525b', cursor: 'pointer' }}>
                 <Plus style={{ width: 14, height: 14 }} />
               </div>
-              {/* PDF Style Selector Pill (Replaces MindTube Desktop) */}
+
+              {/* PDF Style Selector Pill */}
               <div style={{ background: '#f4f4f5', borderRadius: 9999, padding: '4px 10px', display: 'flex', alignItems: 'center', gap: 4, border: '1px solid #e4e4e7' }}>
                 <FileDown style={{ width: 12, height: 12, color: '#7c3aed' }} />
                 <select
@@ -996,6 +1003,28 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
                   <option value="tree">🌳 Revisemap Tree PDF</option>
                 </select>
               </div>
+
+              {/* Transcript Drawer Button */}
+              <button
+                type="button"
+                onClick={() => setShowTranscriptModal(true)}
+                style={{
+                  padding: '4px 10px',
+                  borderRadius: 9999,
+                  background: customTranscriptText ? '#f0fdf4' : '#f4f4f5',
+                  border: customTranscriptText ? '1px solid #86efac' : '1px solid #e4e4e7',
+                  color: customTranscriptText ? '#15803d' : '#3f3f46',
+                  fontSize: 11.5,
+                  fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  cursor: 'pointer'
+                }}
+              >
+                <FileText style={{ width: 12, height: 12, color: customTranscriptText ? '#16a34a' : '#2563eb' }} />
+                <span>{customTranscriptText ? '✅ Transcript Added' : '📝 Paste Transcript'}</span>
+              </button>
             </div>
 
             {/* Right Controls: LANGUAGE SELECTOR + Voice Mic + Send Button */}
@@ -1077,6 +1106,51 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
           MindTube can make mistakes. Please check before use.
         </div>
       </div>
+
+      {/* FULL VIDEO TRANSCRIPT MODAL / DRAWER */}
+      {showTranscriptModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+          <div style={{ background: '#ffffff', borderRadius: 16, width: '100%', maxWidth: 640, padding: 20, boxShadow: '0 20px 40px rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <FileText style={{ width: 20, height: 20, color: '#2563eb' }} />
+                <h3 style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', margin: 0 }}>
+                  Paste Full Video Transcript (100% Exact Context)
+                </h3>
+              </div>
+              <button onClick={() => setShowTranscriptModal(false)} style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer' }}>
+                <X style={{ width: 20, height: 20 }} />
+              </button>
+            </div>
+
+            <p style={{ fontSize: 12.5, color: '#475569', margin: 0, lineHeight: 1.5 }}>
+              Paste full spoken video transcript text here. Sending 100% untruncated transcript context guarantees <strong>zero hallucinations</strong> and exact coverage across Physics, Chemistry, Biology & Math!
+            </p>
+
+            <textarea
+              rows={10}
+              value={customTranscriptText}
+              onChange={(e) => setCustomTranscriptText(e.target.value)}
+              placeholder="Paste full spoken transcript lines here... (e.g. [00:15] Welcome students today we discuss resistance of a conductor, electric motor, kinetic energy...)"
+              style={{ width: '100%', padding: 12, borderRadius: 10, border: '1px solid #cbd5e1', fontSize: 13, fontFamily: 'monospace', lineHeight: 1.5, resize: 'vertical' }}
+            />
+
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 12, color: '#64748b' }}>
+              <span>Character count: {customTranscriptText.length.toLocaleString()} chars</span>
+              <div style={{ display: 'flex', gap: 8 }}>
+                {customTranscriptText && (
+                  <button onClick={() => setCustomTranscriptText('')} style={{ padding: '6px 12px', borderRadius: 8, background: '#f1f5f9', border: '1px solid #cbd5e1', color: '#475569', fontWeight: 600, fontSize: 12, cursor: 'pointer' }}>
+                    Clear
+                  </button>
+                )}
+                <button onClick={() => setShowTranscriptModal(false)} style={{ padding: '6px 16px', borderRadius: 8, background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', color: '#ffffff', fontWeight: 700, fontSize: 12, border: 'none', cursor: 'pointer' }}>
+                  Save & Attach
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

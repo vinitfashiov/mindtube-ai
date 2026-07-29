@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { VideoNoteAnalysis } from "../types/notes";
 import { calculateGeminiCost } from "../types/cost";
-import { fetchYouTubeTranscript } from "./youtubeTranscriptService";
+import { fetchYouTubeTranscript, parseRawTranscriptText, VideoTranscriptResult } from "./youtubeTranscriptService";
 
 // Extract YouTube Video ID from any URL format (watch, live, shorts, embed, youtu.be, etc.)
 export function extractYouTubeId(url: string): string | null {
@@ -598,7 +598,8 @@ export async function generateVideoAnalysis(
   youtubeUrl: string,
   apiKey: string,
   targetLanguage: string = 'en',
-  customModel: string = 'gemini-2.5-flash-lite'
+  customModel: string = 'gemini-2.5-flash-lite',
+  customTranscriptText?: string
 ): Promise<VideoNoteAnalysis> {
   const videoId = extractYouTubeId(youtubeUrl);
   if (!videoId) {
@@ -611,8 +612,14 @@ export async function generateVideoAnalysis(
   const realChannel = meta?.channelName || "YouTube Channel";
   const thumbnailUrl = meta?.thumbnailUrl || getYouTubeThumbnail(videoId);
 
-  // 2. Fetch real spoken transcript from YouTube
-  const transcriptResult = await fetchYouTubeTranscript(videoId);
+  // 2. Fetch or parse spoken transcript
+  let transcriptResult: VideoTranscriptResult;
+  if (customTranscriptText && customTranscriptText.trim().length > 50) {
+    transcriptResult = parseRawTranscriptText(customTranscriptText);
+  } else {
+    transcriptResult = await fetchYouTubeTranscript(videoId);
+  }
+  
   const transcriptText = transcriptResult.fullTranscriptText || '';
 
   // If user enters 'DEMO' or leaves key blank, return high quality demo analysis
@@ -634,16 +641,16 @@ export async function generateVideoAnalysis(
 
   const isHindi = targetLanguage === 'hi';
 
-  // Master Prompt for Source-Grounded Academic Notes with Transcript Analysis
+  // Master Prompt for Source-Grounded Academic Notes with Full Untruncated Transcript (100% Context)
   const prompt = `
 You are an elite educational note generator and master academic study assistant.
 I am analyzing the specific YouTube video:
 - Title: "${realTitle}"
 - Channel: "${realChannel}"
 - Video URL: "${youtubeUrl}" (ID: "${videoId}")
-${transcriptResult.success ? `- SPOKEN VIDEO TRANSCRIPT ATTACHED (${transcriptResult.segments.length} segments, ${transcriptResult.totalDurationSeconds}s total length)` : '- NOTE: Spoken transcript could not be fetched automatically. Rely strictly on real video subject metadata without inventing unsupported topics.'}
+${transcriptResult.success ? `- FULL SPOKEN VIDEO TRANSCRIPT ATTACHED (${transcriptResult.segments.length} segments, ${transcriptResult.totalDurationSeconds}s total duration, ${transcriptResult.totalCharacterCount} characters):` : '- NOTE: Spoken transcript could not be retrieved automatically. Rely strictly on real video metadata.'}
 
-${transcriptResult.success ? `=== REAL SPOKEN TRANSCRIPT (SOURCE GROUND TRUTH) ===\n${transcriptText.substring(0, 40000)}\n=== END SPOKEN TRANSCRIPT ===` : ''}
+${transcriptResult.success ? `=== COMPLETE UNTRUNCATED SPOKEN VIDEO TRANSCRIPT (SOURCE GROUND TRUTH) ===\n${transcriptText}\n=== END COMPLETE SPOKEN TRANSCRIPT ===` : ''}
 
 ABSOLUTE CRITICAL PIPELINE & SOURCE FIDELITY RULES:
 1. SOURCE-GROUNDING & TOPIC INVENTORY FIRST (Zero Topic Misclassification):

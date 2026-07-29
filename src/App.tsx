@@ -249,7 +249,7 @@ export const App: React.FC = () => {
   };
 
   // Single Unified Input Handler (YouTube URL or General Q&A)
-  const handleSendMessage = async (inputText: string) => {
+  const handleSendMessage = async (inputText: string, customTranscriptText?: string) => {
     const query = inputText.trim();
     if (!query) return;
 
@@ -299,7 +299,7 @@ export const App: React.FC = () => {
       const procMsg: MasterChatMessage = {
         id: 'proc-' + Date.now(),
         sender: 'assistant',
-        text: 'Analyzing YouTube Video Request...',
+        text: 'Analyzing YouTube Video Request & Full Spoken Transcript...',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         isProcessing: true
       };
@@ -312,7 +312,7 @@ export const App: React.FC = () => {
       setErrorMsg(null);
 
       try {
-        const result = await generateVideoAnalysis(query, apiKey, currentLanguage, selectedModel);
+        const result = await generateVideoAnalysis(query, apiKey, currentLanguage, selectedModel, customTranscriptText);
         setAnalysis(result);
         if (result.usageCost) {
           recordApiUsage('video_synthesis', result.usageCost, result.videoTitle);
