@@ -290,7 +290,7 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
     <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', overflow: 'hidden' }}>
       {/* If Active Chat Session Messages is Empty: Show Fresh Hero + 4 Action Cards */}
       {messages.length === 0 && !isLoading ? (
-        <div className="no-scrollbar" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 18, paddingTop: '10vh', paddingBottom: 20, margin: '0 auto', width: '100%', maxWidth: 680 }}>
+        <div className="no-scrollbar" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 14, paddingTop: '16px', paddingBottom: 16, paddingLeft: 14, paddingRight: 14, margin: '0 auto', width: '100%', maxWidth: 680 }}>
           {/* Central Hero Heading */}
           <div style={{ textAlign: 'center', padding: '0 0 4px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
             <h1 style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.3px', color: '#0f172a', marginBottom: 2 }}>
@@ -875,8 +875,8 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
         </div>
       )}
 
-      {/* Single ChatGPT Master Input Capsule (Fixed Bottom) */}
-      <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 8, padding: '10px 16px 14px 16px', background: '#ffffff', width: '100%', maxWidth: 720, margin: '0 auto' }}>
+      {/* Single ChatGPT Master Input Capsule (Fixed Bottom Sticky 24/7) */}
+      <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 8, padding: '8px 12px max(10px, env(safe-area-inset-bottom)) 12px', background: '#ffffff', width: '100%', maxWidth: 720, margin: '0 auto', position: 'sticky', bottom: 0, zIndex: 100 }}>
         <form onSubmit={handleSubmit} className="agent-input-container" style={{ borderRadius: 28, padding: '14px 18px', border: isListening ? '1.5px solid #ef4444' : '1.5px solid #e4e4e7', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
           <textarea
             ref={textareaRef}

@@ -282,8 +282,9 @@ export const ChatGptSidebar: React.FC<ChatGptSidebarProps> = ({
       style={{
         position: 'fixed',
         inset: 0,
-        zIndex: 200,
-        background: 'rgba(0,0,0,0.4)',
+        zIndex: 300,
+        background: 'rgba(15, 23, 42, 0.6)',
+        backdropFilter: 'blur(4px)',
         display: 'flex'
       }}
       onClick={onClose}
@@ -292,8 +293,10 @@ export const ChatGptSidebar: React.FC<ChatGptSidebarProps> = ({
         onClick={(e) => e.stopPropagation()}
         style={{
           width: 280,
+          maxWidth: '85vw',
           height: '100%',
-          background: '#ffffff'
+          background: '#ffffff',
+          boxShadow: '4px 0 24px rgba(0,0,0,0.15)'
         }}
       >
         {sidebarContent}
