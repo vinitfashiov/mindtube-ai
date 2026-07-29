@@ -447,7 +447,10 @@ export const App: React.FC = () => {
           isDesktop={isDesktop}
           isSidebarOpen={isSidebarOpen}
           selectedModel={selectedModel}
+          onSelectModel={(model) => setSelectedModel(model)}
           onOpenSettings={() => setIsSettingsModalOpen(true)}
+          apiCostSummary={apiCostSummary}
+          onOpenCostDashboard={() => setIsCostDashboardOpen(true)}
         />
 
         {/* Main Content Workspace Container */}

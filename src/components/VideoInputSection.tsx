@@ -292,91 +292,113 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
       {/* If Active Chat Session Messages is Empty: Show Fresh Hero + 4 Action Cards */}
       {messages.length === 0 && !isLoading ? (
         <div className="no-scrollbar hero-scroll-container" style={{ flex: 1, height: '100%', minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 14, paddingTop: '12px', paddingBottom: 12, paddingLeft: 12, paddingRight: 12, margin: '0 auto', width: '100%', maxWidth: 680 }}>
-          {/* Central Hero Heading */}
-          <div style={{ textAlign: 'center', padding: '0 0 4px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-            <h1 style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.3px', color: '#0f172a', marginBottom: 2 }}>
-              What would you like to study or ask today?
+          {/* Central Manus Hero Heading */}
+          <div style={{ textAlign: 'center', padding: '16px 0 8px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+            <h1 className="hero-heading-title" style={{ fontSize: 32, fontWeight: 500, color: '#18181b', fontFamily: 'Georgia, serif', letterSpacing: '-0.5px', marginBottom: 2 }}>
+              What can I do for you?
             </h1>
-            <p style={{ fontSize: 13, color: '#64748b', fontWeight: 400, maxWidth: 460, margin: '0 auto', lineHeight: 1.5 }}>
+            <p className="hero-subtext" style={{ fontSize: 13.5, color: '#71717a', fontWeight: 400, maxWidth: 480, margin: '0 auto', lineHeight: 1.5 }}>
               Ask any Math, Coding, Physics or Study question, or paste a YouTube URL to generate Class Notes PDFs, MCQ Quizzes & Mindmaps!
             </p>
           </div>
 
-          {/* 2x2 Grid of Feature Action Cards */}
-          <div className="agent-action-grid" style={{ maxWidth: 680, margin: '0 auto' }}>
-            <div onClick={() => onOpenPdf()} className="agent-action-card">
-              <div className="agent-icon-badge" style={{ background: '#f0fdf4', borderColor: '#bbf7d0', color: '#16a34a' }}>
-                <FileDown style={{ width: 16, height: 16 }} />
-              </div>
-              <div>
-                <div style={{ fontWeight: 600, fontSize: 13, color: '#1e293b', marginBottom: 2 }}>
-                  Class Notes PDF
-                </div>
-                <div style={{ fontSize: 11, color: '#64748b', fontWeight: 400 }}>
-                  Printable multi-column handbook
-                </div>
-              </div>
-            </div>
+          {/* Manus Horizontal Action Suggestion Pills */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 8, maxWidth: 680, margin: '0 auto', width: '100%' }}>
+            <button
+              onClick={() => onOpenPdf()}
+              style={{
+                padding: '6px 14px',
+                borderRadius: 9999,
+                background: '#ffffff',
+                border: '1px solid #e4e4e7',
+                fontSize: 12.5,
+                fontWeight: 500,
+                color: '#3f3f46',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                cursor: 'pointer',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+                transition: 'all 0.15s ease'
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = '#f4f4f5')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = '#ffffff')}
+            >
+              <FileDown style={{ width: 14, height: 14, color: '#16a34a' }} />
+              <span>Class Notes PDF</span>
+            </button>
 
-            <div onClick={() => handleSampleClick('https://www.youtube.com/watch?v=1PXFAFMgdns')} className="agent-action-card">
-              <div className="agent-icon-badge" style={{ background: '#eff6ff', borderColor: '#dbeafe', color: '#2563eb' }}>
-                <GitFork style={{ width: 16, height: 16 }} />
-              </div>
-              <div>
-                <div style={{ fontWeight: 600, fontSize: 13, color: '#1e293b', marginBottom: 2 }}>
-                  Interactive MindMap
-                </div>
-                <div style={{ fontSize: 11, color: '#64748b', fontWeight: 400 }}>
-                  Visual concept tree with zoom
-                </div>
-              </div>
-            </div>
+            <button
+              onClick={() => handleSampleClick('https://www.youtube.com/watch?v=1PXFAFMgdns')}
+              style={{
+                padding: '6px 14px',
+                borderRadius: 9999,
+                background: '#ffffff',
+                border: '1px solid #e4e4e7',
+                fontSize: 12.5,
+                fontWeight: 500,
+                color: '#3f3f46',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                cursor: 'pointer',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+                transition: 'all 0.15s ease'
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = '#f4f4f5')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = '#ffffff')}
+            >
+              <GitFork style={{ width: 14, height: 14, color: '#2563eb' }} />
+              <span>Interactive MindMap</span>
+            </button>
 
-            <div onClick={() => handleSampleClick('https://www.youtube.com/watch?v=aircAruvnKk')} className="agent-action-card">
-              <div className="agent-icon-badge" style={{ background: '#fff7ed', borderColor: '#ffedd5', color: '#ea580c' }}>
-                <Zap style={{ width: 16, height: 16 }} />
-              </div>
-              <div>
-                <div style={{ fontWeight: 600, fontSize: 13, color: '#1e293b', marginBottom: 2 }}>
-                  Active Recall Memory
-                </div>
-                <div style={{ fontSize: 11, color: '#64748b', fontWeight: 400 }}>
-                  SuperMemo-2 local tracker
-                </div>
-              </div>
-            </div>
+            <button
+              onClick={() => handleSampleClick('https://www.youtube.com/watch?v=aircAruvnKk')}
+              style={{
+                padding: '6px 14px',
+                borderRadius: 9999,
+                background: '#ffffff',
+                border: '1px solid #e4e4e7',
+                fontSize: 12.5,
+                fontWeight: 500,
+                color: '#3f3f46',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                cursor: 'pointer',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+                transition: 'all 0.15s ease'
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = '#f4f4f5')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = '#ffffff')}
+            >
+              <Zap style={{ width: 14, height: 14, color: '#ea580c' }} />
+              <span>Active Recall</span>
+            </button>
 
-            <div onClick={onOpenChat} className="agent-action-card">
-              <div className="agent-icon-badge" style={{ background: '#f3e8ff', borderColor: '#e9d5ff', color: '#7c3aed' }}>
-                <Bot style={{ width: 16, height: 16 }} />
-              </div>
-              <div>
-                <div style={{ fontWeight: 600, fontSize: 13, color: '#1e293b', marginBottom: 2 }}>
-                  Voice & Text AI Copilot
-                </div>
-                <div style={{ fontSize: 11, color: '#64748b', fontWeight: 400 }}>
-                  Full ChatGPT reasoning copilot
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* DEMO SAMPLES Pills */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxWidth: 680, margin: '0 auto', width: '100%' }}>
-            <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: '#94a3b8' }}>
-              TRY DEMO VIDEOS
-            </span>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              <button onClick={() => handleSampleClick('https://www.youtube.com/watch?v=1PXFAFMgdns')} className="agent-pill">
-                Claude Code 7 Levels
-              </button>
-              <button onClick={() => handleSampleClick('https://www.youtube.com/watch?v=aircAruvnKk')} className="agent-pill">
-                Neural Networks 101
-              </button>
-              <button onClick={() => handleSampleClick('https://www.youtube.com/watch?v=bMknfKXIFA8')} className="agent-pill">
-                React 19 & Next.js 15
-              </button>
-            </div>
+            <button
+              onClick={onOpenChat}
+              style={{
+                padding: '6px 14px',
+                borderRadius: 9999,
+                background: '#ffffff',
+                border: '1px solid #e4e4e7',
+                fontSize: 12.5,
+                fontWeight: 500,
+                color: '#3f3f46',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                cursor: 'pointer',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+                transition: 'all 0.15s ease'
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = '#f4f4f5')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = '#ffffff')}
+            >
+              <Bot style={{ width: 14, height: 14, color: '#7c3aed' }} />
+              <span>Voice Copilot</span>
+            </button>
           </div>
         </div>
       ) : (
@@ -903,9 +925,15 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
           />
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', paddingTop: 4 }}>
-            {/* Left '+' Icon Circle */}
-            <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#f4f4f5', border: '1px solid #e4e4e7', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#52525b', cursor: 'pointer' }}>
-              <Plus style={{ width: 16, height: 16 }} />
+            {/* Left Controls: '+' Icon & MindTube Desktop Agent Pill */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#f4f4f5', border: '1px solid #e4e4e7', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#52525b', cursor: 'pointer' }}>
+                <Plus style={{ width: 14, height: 14 }} />
+              </div>
+              <div style={{ padding: '3px 8px', borderRadius: 8, background: '#f4f4f5', border: '1px solid #e4e4e7', fontSize: 11.5, fontWeight: 500, color: '#3f3f46', display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
+                <Bot style={{ width: 13, height: 13, color: '#09090b' }} />
+                <span>MindTube Desktop</span>
+              </div>
             </div>
 
             {/* Right Controls: LANGUAGE SELECTOR + Voice Mic + Send Button */}
@@ -937,8 +965,8 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
                 onClick={toggleVoiceRecognition}
                 title={isListening ? "Stop Listening" : "Start Voice Input"}
                 style={{
-                  width: 32,
-                  height: 32,
+                  width: 30,
+                  height: 30,
                   borderRadius: '50%',
                   background: isListening ? '#fef2f2' : '#f4f4f5',
                   border: isListening ? '1px solid #fca5a5' : 'none',
@@ -950,36 +978,42 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
                   animation: isListening ? 'pulse 1.5s infinite' : 'none'
                 }}
               >
-                {isListening ? <MicOff style={{ width: 16, height: 16 }} /> : <Mic style={{ width: 16, height: 16 }} />}
+                {isListening ? <MicOff style={{ width: 15, height: 15 }} /> : <Mic style={{ width: 15, height: 15 }} />}
               </button>
 
               <button
                 type="submit"
                 disabled={!inputText.trim() || isAiResponding}
                 style={{
-                  width: 36,
-                  height: 36,
+                  width: 32,
+                  height: 32,
                   borderRadius: '50%',
-                  background: inputText.trim() ? '#2563eb' : '#09090b',
+                  background: '#09090b',
                   color: '#ffffff',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   border: 'none',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
                   transition: 'all 0.2s ease',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  opacity: !inputText.trim() && !isAiResponding ? 0.6 : 1
                 }}
               >
                 {inputText.trim() ? (
-                  <Send style={{ width: 16, height: 16 }} />
+                  <Send style={{ width: 14, height: 14 }} />
                 ) : (
-                  <AudioLines style={{ width: 17, height: 17 }} />
+                  <AudioLines style={{ width: 15, height: 15 }} />
                 )}
               </button>
             </div>
           </div>
         </form>
+
+        {/* Manus Footer Disclaimer Text */}
+        <div style={{ textAlign: 'center', fontSize: 11, color: '#a1a1aa', paddingBottom: 2 }}>
+          MindTube is an AI Agent and can make mistakes. Please double-check before use.
+        </div>
       </div>
     </div>
   );
