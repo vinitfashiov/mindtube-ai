@@ -37,23 +37,15 @@ export const App: React.FC = () => {
     } catch (err) {
       console.warn('Failed to load chat sessions:', err);
     }
-    // Default initial sample session
-    const defaultSession: ChatSession = {
-      id: 'sess-sample-1',
-      title: 'Claude Code 7 Levels',
+    // Fresh clean initial session for new devices & browsers
+    const freshSession: ChatSession = {
+      id: 'sess-' + Date.now(),
+      title: 'New chat',
       createdAt: new Date().toISOString(),
-      messages: [
-        {
-          id: 'card-sample',
-          sender: 'assistant',
-          text: '✨ Master Class Notes PDF & Mindmap generated for: "The 7 Levels of Building ELITE Websites with Claude Code"',
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          analysisCard: SAMPLE_ANALYSIS
-        }
-      ],
-      analysis: SAMPLE_ANALYSIS
+      messages: [],
+      analysis: null
     };
-    return [defaultSession];
+    return [freshSession];
   });
 
   const [activeSessionId, setActiveSessionId] = useState<string>(() => {
@@ -64,10 +56,10 @@ export const App: React.FC = () => {
         if (parsed.length > 0) return parsed[0].id;
       } catch {}
     }
-    return 'sess-sample-1';
+    return '';
   });
 
-  const [analysis, setAnalysis] = useState<VideoNoteAnalysis | null>(SAMPLE_ANALYSIS);
+  const [analysis, setAnalysis] = useState<VideoNoteAnalysis | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isAiResponding, setIsAiResponding] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
