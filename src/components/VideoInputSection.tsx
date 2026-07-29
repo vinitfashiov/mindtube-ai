@@ -10,7 +10,6 @@ import {
   MicOff,
   AudioLines,
   Languages,
-  User,
   Volume2,
   Sparkles,
   Loader2,
@@ -421,28 +420,41 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: msg.sender === 'user' ? 'flex-end' : 'flex-start',
-                  gap: 6
+                  gap: 6,
+                  width: '100%'
                 }}
               >
+                {/* Manus Header Row with Avatar & Timestamp */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   {msg.sender === 'assistant' ? (
-                    <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#2563eb', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Bot style={{ width: 14, height: 14 }} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <div style={{ width: 22, height: 22, borderRadius: 6, background: '#09090b', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Sparkles style={{ width: 12, height: 12 }} />
+                      </div>
+                      <span style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 13.5, color: '#09090b' }}>
+                        mindtube
+                      </span>
+                      <span style={{ fontSize: 10, fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: '#f4f4f5', color: '#71717a' }}>
+                        Lite
+                      </span>
                     </div>
                   ) : (
-                    <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#09090b', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <User style={{ width: 14, height: 14 }} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#3b82f6', color: '#ffffff', fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        VK
+                      </div>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: '#09090b' }}>You</span>
                     </div>
                   )}
-                  <span style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>{msg.sender === 'user' ? 'You' : 'MindTube AI'} • {msg.timestamp}</span>
+                  <span style={{ fontSize: 11, color: '#a1a1aa' }}>• {msg.timestamp}</span>
 
                   {msg.sender === 'assistant' && !msg.isProcessing && (
                     <button
                       onClick={() => handleSpeakText(msg.text)}
                       title="Read aloud with Voice AI"
-                      style={{ color: '#2563eb', padding: 2 }}
+                      style={{ color: '#71717a', padding: 2, background: 'transparent', border: 'none', cursor: 'pointer' }}
                     >
-                      <Volume2 style={{ width: 14, height: 14 }} />
+                      <Volume2 style={{ width: 13, height: 13 }} />
                     </button>
                   )}
 
@@ -454,29 +466,30 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
                   )}
                 </div>
 
-                {/* Message Bubble Container */}
+                {/* Message Bubble Container (Manus Styling) */}
                 <div
                   style={{
-                    maxWidth: '96%',
+                    maxWidth: msg.sender === 'user' ? '85%' : '100%',
                     width: card ? '100%' : 'auto',
-                    padding: '14px 18px',
-                    borderRadius: msg.sender === 'user' ? '20px 20px 4px 20px' : '20px 20px 20px 4px',
-                    background: msg.sender === 'user' ? '#2563eb' : '#ffffff',
-                    border: msg.sender === 'user' ? 'none' : '1px solid #e2e8f0',
-                    color: msg.sender === 'user' ? '#ffffff' : '#0f172a',
-                    fontSize: 14,
+                    padding: msg.sender === 'user' ? '10px 16px' : '16px 20px',
+                    borderRadius: msg.sender === 'user' ? '16px 16px 4px 16px' : '16px',
+                    background: msg.sender === 'user' ? '#09090b' : '#ffffff',
+                    border: msg.sender === 'user' ? 'none' : '1px solid #e4e4e7',
+                    color: msg.sender === 'user' ? '#ffffff' : '#09090b',
+                    fontSize: 13.5,
                     lineHeight: 1.55,
-                    boxShadow: msg.sender === 'user' ? '0 4px 14px rgba(37, 99, 235, 0.2)' : '0 2px 10px rgba(15, 23, 42, 0.04)'
+                    boxShadow: msg.sender === 'user' ? '0 2px 8px rgba(0,0,0,0.1)' : '0 1px 3px rgba(0,0,0,0.02)'
                   }}
                 >
                   {msg.isProcessing ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#2563eb', fontWeight: 700 }}>
-                        <Loader2 style={{ width: 16, height: 16 }} className="animate-spin" />
-                        <span>Extracting YouTube Video Transcript & Key Concepts...</span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '4px 0' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#09090b', fontWeight: 600, fontSize: 13 }}>
+                        <Loader2 style={{ width: 15, height: 15, color: '#2563eb' }} className="animate-spin" />
+                        <span>MindTube is working</span>
                       </div>
-                      <div style={{ fontSize: 12, color: '#64748b' }}>
-                        Structuring Mindmap, Flashcards & Class Notes PDF...
+                      <div style={{ fontSize: 12, color: '#71717a', paddingLeft: 23, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        <div>✓ Extracting YouTube transcript & key concepts</div>
+                        <div>✓ Generating Class Notes PDF, Mindmap & Quiz</div>
                       </div>
                     </div>
                   ) : msg.sender === 'assistant' ? (
@@ -485,7 +498,7 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
 
                       {/* Video Note Analysis Interactive Action Bar */}
                       {card && (
-                        <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #f1f5f9', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                        <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #f4f4f5', display: 'flex', flexDirection: 'column', gap: 12 }}>
                           {/* 5 Interactive Student Study Action Buttons */}
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                             <button
