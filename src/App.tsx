@@ -324,7 +324,7 @@ export const App: React.FC = () => {
       />
 
       {/* Main Workspace Area */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', maxHeight: '100vh', overflow: 'hidden', background: '#ffffff', minWidth: 0 }}>
+      <div style={{ flex: 1, display: 'grid', gridTemplateRows: 'auto 1fr', height: '100dvh', maxHeight: '100dvh', overflow: 'hidden', background: '#ffffff', minWidth: 0 }}>
         {/* Top Header Bar */}
         <Navbar
           apiKey={apiKey}
