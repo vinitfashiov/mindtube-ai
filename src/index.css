@@ -175,9 +175,13 @@ button {
 /* Desktop Hero Container Vertical Centering (Desktop Only!) */
 @media (min-width: 768px) {
   .hero-scroll-container {
+    display: flex !important;
+    flex-direction: column !important;
     justify-content: center !important;
-    padding-top: 32px !important;
-    padding-bottom: 32px !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    padding-top: 16px !important;
+    padding-bottom: 16px !important;
   }
 }
 

@@ -291,7 +291,7 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
     <div style={{ width: '100%', height: '100%', minHeight: 0, display: 'grid', gridTemplateRows: '1fr auto', overflow: 'hidden' }}>
       {/* If Active Chat Session Messages is Empty: Show Fresh Hero + 4 Action Cards */}
       {messages.length === 0 && !isLoading ? (
-        <div className="no-scrollbar hero-scroll-container" style={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 14, paddingTop: '12px', paddingBottom: 12, paddingLeft: 12, paddingRight: 12, margin: '0 auto', width: '100%', maxWidth: 680 }}>
+        <div className="no-scrollbar hero-scroll-container" style={{ flex: 1, height: '100%', minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 14, paddingTop: '12px', paddingBottom: 12, paddingLeft: 12, paddingRight: 12, margin: '0 auto', width: '100%', maxWidth: 680 }}>
           {/* Central Hero Heading */}
           <div style={{ textAlign: 'center', padding: '0 0 4px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
             <h1 style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.3px', color: '#0f172a', marginBottom: 2 }}>
