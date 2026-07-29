@@ -13,6 +13,7 @@ import {
   Settings
 } from 'lucide-react';
 import { ChatSession } from '../types/notes';
+import { ApiCostSummary } from '../types/cost';
 
 interface ChatGptSidebarProps {
   isOpen: boolean;
@@ -27,6 +28,7 @@ interface ChatGptSidebarProps {
   onOpenCostDashboard?: () => void;
   onOpenSettings?: () => void;
   selectedModel?: string;
+  apiCostSummary?: ApiCostSummary;
   currentLanguage: string;
   onSelectLanguage: (lang: string) => void;
   isDesktop?: boolean;
@@ -45,6 +47,7 @@ export const ChatGptSidebar: React.FC<ChatGptSidebarProps> = ({
   onOpenCostDashboard,
   onOpenSettings,
   selectedModel,
+  apiCostSummary,
   currentLanguage,
   onSelectLanguage,
   isDesktop = false
@@ -167,20 +170,28 @@ export const ChatGptSidebar: React.FC<ChatGptSidebarProps> = ({
             }}
             style={{
               padding: '8px 10px',
-              borderRadius: 8,
+              borderRadius: 10,
               display: 'flex',
               alignItems: 'center',
-              gap: 10,
+              justifyContent: 'space-between',
+              gap: 8,
               fontSize: 13,
               color: '#15803d',
               fontWeight: 600,
               background: '#f0fdf4',
               border: '1px solid #bbf7d0',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              boxShadow: '0 1px 3px rgba(22, 163, 74, 0.08)'
             }}
+            title="Open API Cost & Token Usage Dashboard"
           >
-            <Coins style={{ width: 16, height: 16, color: '#16a34a' }} />
-            <span>API Cost & Analytics</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <Coins style={{ width: 16, height: 16, color: '#16a34a' }} />
+              <span>API Cost & Usage</span>
+            </div>
+            <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 7px', borderRadius: 9999, background: '#dcfce7', color: '#166534' }}>
+              ${apiCostSummary?.totalCostUsd.toFixed(4) || '0.0000'}
+            </span>
           </button>
 
           {/* Language Selector */}

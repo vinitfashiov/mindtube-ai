@@ -423,6 +423,7 @@ export const App: React.FC = () => {
         onOpenCostDashboard={() => setIsCostDashboardOpen(true)}
         onOpenSettings={() => setIsSettingsModalOpen(true)}
         selectedModel={selectedModel}
+        apiCostSummary={apiCostSummary}
         currentLanguage={currentLanguage}
         onSelectLanguage={handleSelectLanguage}
         isDesktop={isDesktop}
@@ -445,8 +446,8 @@ export const App: React.FC = () => {
           onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
           isDesktop={isDesktop}
           isSidebarOpen={isSidebarOpen}
-          apiCostSummary={apiCostSummary}
-          onOpenCostDashboard={() => setIsCostDashboardOpen(true)}
+          selectedModel={selectedModel}
+          onOpenSettings={() => setIsSettingsModalOpen(true)}
         />
 
         {/* Main Content Workspace Container */}

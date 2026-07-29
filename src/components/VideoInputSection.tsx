@@ -294,10 +294,10 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
         <div className="no-scrollbar hero-scroll-container" style={{ flex: 1, height: '100%', minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 14, paddingTop: '12px', paddingBottom: 12, paddingLeft: 12, paddingRight: 12, margin: '0 auto', width: '100%', maxWidth: 680 }}>
           {/* Central Hero Heading */}
           <div style={{ textAlign: 'center', padding: '0 0 4px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-            <h1 className="hero-heading-title" style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.3px', color: '#0f172a', marginBottom: 2 }}>
+            <h1 style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.3px', color: '#0f172a', marginBottom: 2 }}>
               What would you like to study or ask today?
             </h1>
-            <p className="hero-subtext" style={{ fontSize: 13, color: '#64748b', fontWeight: 400, maxWidth: 460, margin: '0 auto', lineHeight: 1.5 }}>
+            <p style={{ fontSize: 13, color: '#64748b', fontWeight: 400, maxWidth: 460, margin: '0 auto', lineHeight: 1.5 }}>
               Ask any Math, Coding, Physics or Study question, or paste a YouTube URL to generate Class Notes PDFs, MCQ Quizzes & Mindmaps!
             </p>
           </div>
@@ -309,10 +309,10 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
                 <FileDown style={{ width: 16, height: 16 }} />
               </div>
               <div>
-                <div className="agent-action-card-title" style={{ fontWeight: 600, fontSize: 13, color: '#1e293b', marginBottom: 2 }}>
+                <div style={{ fontWeight: 600, fontSize: 13, color: '#1e293b', marginBottom: 2 }}>
                   Class Notes PDF
                 </div>
-                <div className="agent-action-card-subtext" style={{ fontSize: 11, color: '#64748b', fontWeight: 400 }}>
+                <div style={{ fontSize: 11, color: '#64748b', fontWeight: 400 }}>
                   Printable multi-column handbook
                 </div>
               </div>
@@ -323,10 +323,10 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
                 <GitFork style={{ width: 16, height: 16 }} />
               </div>
               <div>
-                <div className="agent-action-card-title" style={{ fontWeight: 600, fontSize: 13, color: '#1e293b', marginBottom: 2 }}>
+                <div style={{ fontWeight: 600, fontSize: 13, color: '#1e293b', marginBottom: 2 }}>
                   Interactive MindMap
                 </div>
-                <div className="agent-action-card-subtext" style={{ fontSize: 11, color: '#64748b', fontWeight: 400 }}>
+                <div style={{ fontSize: 11, color: '#64748b', fontWeight: 400 }}>
                   Visual concept tree with zoom
                 </div>
               </div>
@@ -337,10 +337,10 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
                 <Zap style={{ width: 16, height: 16 }} />
               </div>
               <div>
-                <div className="agent-action-card-title" style={{ fontWeight: 600, fontSize: 13, color: '#1e293b', marginBottom: 2 }}>
+                <div style={{ fontWeight: 600, fontSize: 13, color: '#1e293b', marginBottom: 2 }}>
                   Active Recall Memory
                 </div>
-                <div className="agent-action-card-subtext" style={{ fontSize: 11, color: '#64748b', fontWeight: 400 }}>
+                <div style={{ fontSize: 11, color: '#64748b', fontWeight: 400 }}>
                   SuperMemo-2 local tracker
                 </div>
               </div>
@@ -351,10 +351,10 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
                 <Bot style={{ width: 16, height: 16 }} />
               </div>
               <div>
-                <div className="agent-action-card-title" style={{ fontWeight: 600, fontSize: 13, color: '#1e293b', marginBottom: 2 }}>
+                <div style={{ fontWeight: 600, fontSize: 13, color: '#1e293b', marginBottom: 2 }}>
                   Voice & Text AI Copilot
                 </div>
-                <div className="agent-action-card-subtext" style={{ fontSize: 11, color: '#64748b', fontWeight: 400 }}>
+                <div style={{ fontSize: 11, color: '#64748b', fontWeight: 400 }}>
                   Full ChatGPT reasoning copilot
                 </div>
               </div>
@@ -366,7 +366,7 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
             <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: '#94a3b8' }}>
               TRY DEMO VIDEOS
             </span>
-            <div className="demo-pills-row no-scrollbar" style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
               <button onClick={() => handleSampleClick('https://www.youtube.com/watch?v=1PXFAFMgdns')} className="agent-pill">
                 Claude Code 7 Levels
               </button>
