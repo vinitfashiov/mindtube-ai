@@ -885,7 +885,7 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
 
       {/* Single ChatGPT Master Input Capsule (Fixed Bottom Sticky 24/7) */}
       <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 8, padding: '8px 12px max(10px, env(safe-area-inset-bottom)) 12px', background: '#ffffff', width: '100%', maxWidth: 720, margin: '0 auto', position: 'sticky', bottom: 0, zIndex: 100 }}>
-        <form onSubmit={handleSubmit} className="agent-input-container" style={{ borderRadius: 28, padding: '14px 18px', border: isListening ? '1.5px solid #ef4444' : '1.5px solid #e4e4e7', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+        <form onSubmit={handleSubmit} className="agent-input-container" style={{ borderRadius: 28, padding: '16px 20px', border: isListening ? '1.5px solid #ef4444' : '1.5px solid #e4e4e7', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
           <textarea
             ref={textareaRef}
             rows={1}
@@ -899,7 +899,7 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
             }}
             placeholder={isListening ? "🎙️ Listening... speak now..." : "Ask any question, code, math problem, or paste YouTube URL..."}
             className="agent-input-field"
-            style={{ resize: 'none', fontSize: 14 }}
+            style={{ resize: 'none', fontSize: 14.5, minHeight: 40, lineHeight: 1.45 }}
           />
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', paddingTop: 4 }}>
