@@ -1054,7 +1054,7 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
 
         {/* Manus Footer Disclaimer Text */}
         <div style={{ textAlign: 'center', fontSize: 11, color: '#a1a1aa', paddingBottom: 2 }}>
-          MindTube is an AI Agent and can make mistakes. Please double-check before use.
+          MindTube can make mistakes. Please check before use.
         </div>
       </div>
     </div>
