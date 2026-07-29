@@ -70,7 +70,7 @@ export const ApiCostDashboardModal: React.FC<ApiCostDashboardModalProps> = ({
                 API Cost & Token Usage Dashboard
               </h2>
               <div style={{ fontSize: 12, color: '#64748b', fontWeight: 500 }}>
-                Real-Time Gemini 2.5 Flash Cost Meter (USD & INR)
+                Real-Time Gemini 2.5 Flash Lite Cost Meter (USD & INR)
               </div>
             </div>
           </div>
@@ -96,7 +96,7 @@ export const ApiCostDashboardModal: React.FC<ApiCostDashboardModalProps> = ({
                 ${summary.totalCostUsd.toFixed(5)}
               </div>
               <div style={{ fontSize: 11, color: '#15803d', marginTop: 2 }}>
-                Micro-cents accurate
+                Flash Lite ultra-low cost
               </div>
             </div>
 
@@ -144,14 +144,14 @@ export const ApiCostDashboardModal: React.FC<ApiCostDashboardModalProps> = ({
           <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: 16, borderRadius: 14 }}>
             <h3 style={{ fontSize: 13, fontWeight: 800, color: '#0f172a', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: 6 }}>
               <Info style={{ width: 15, height: 15, color: '#2563eb' }} />
-              Official Gemini 2.5 Flash API Rate Card
+              Official Gemini 2.5 Flash Lite API Rate Card
             </h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12, fontSize: 12, color: '#475569' }}>
               <div>
-                <strong>Input Tokens:</strong> ${INPUT_TOKEN_COST_PER_MILLION} / 1 Million Tokens ($0.000075 / 1K)
+                <strong>Input Tokens:</strong> ${INPUT_TOKEN_COST_PER_MILLION} / 1M Tokens ($0.000015 / 1K)
               </div>
               <div>
-                <strong>Output Tokens:</strong> ${OUTPUT_TOKEN_COST_PER_MILLION} / 1 Million Tokens ($0.00030 / 1K)
+                <strong>Output Tokens:</strong> ${OUTPUT_TOKEN_COST_PER_MILLION} / 1M Tokens ($0.000060 / 1K)
               </div>
               <div>
                 <strong>FX Rate:</strong> 1 USD = ₹{USD_TO_INR_RATE} INR
@@ -162,7 +162,7 @@ export const ApiCostDashboardModal: React.FC<ApiCostDashboardModalProps> = ({
           {/* Operation Cost Matrix Table */}
           <div>
             <h3 style={{ fontSize: 14, fontWeight: 800, color: '#0f172a', marginBottom: 10 }}>
-              Per-Operation Typical Unit Costs
+              Per-Operation Typical Unit Costs (Flash Lite)
             </h3>
 
             <div style={{ border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden' }}>
@@ -182,8 +182,8 @@ export const ApiCostDashboardModal: React.FC<ApiCostDashboardModalProps> = ({
                       Full Video PDF Notes & Mindmap Synthesis
                     </td>
                     <td style={{ padding: '10px 14px' }}>2,500 In / 3,800 Out</td>
-                    <td style={{ padding: '10px 14px', fontWeight: 700, color: '#16a34a' }}>~$0.00133</td>
-                    <td style={{ padding: '10px 14px', fontWeight: 700, color: '#15803d' }}>~₹0.11 (11 paise)</td>
+                    <td style={{ padding: '10px 14px', fontWeight: 700, color: '#16a34a' }}>~$0.000265</td>
+                    <td style={{ padding: '10px 14px', fontWeight: 700, color: '#15803d' }}>~₹0.02 (2 paise)</td>
                   </tr>
                   <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
                     <td style={{ padding: '10px 14px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -200,8 +200,8 @@ export const ApiCostDashboardModal: React.FC<ApiCostDashboardModalProps> = ({
                       ChatGPT AI Reasoning Q&A Prompt
                     </td>
                     <td style={{ padding: '10px 14px' }}>800 In / 600 Out</td>
-                    <td style={{ padding: '10px 14px', fontWeight: 700, color: '#16a34a' }}>~$0.00024</td>
-                    <td style={{ padding: '10px 14px', fontWeight: 700, color: '#15803d' }}>~₹0.02 (2 paise)</td>
+                    <td style={{ padding: '10px 14px', fontWeight: 700, color: '#16a34a' }}>~$0.000048</td>
+                    <td style={{ padding: '10px 14px', fontWeight: 700, color: '#15803d' }}>~₹0.004 (0.4 paise)</td>
                   </tr>
                   <tr>
                     <td style={{ padding: '10px 14px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -209,8 +209,8 @@ export const ApiCostDashboardModal: React.FC<ApiCostDashboardModalProps> = ({
                       Hindi Language Academic Translation
                     </td>
                     <td style={{ padding: '10px 14px' }}>3,000 In / 3,500 Out</td>
-                    <td style={{ padding: '10px 14px', fontWeight: 700, color: '#16a34a' }}>~$0.00128</td>
-                    <td style={{ padding: '10px 14px', fontWeight: 700, color: '#15803d' }}>~₹0.11 (11 paise)</td>
+                    <td style={{ padding: '10px 14px', fontWeight: 700, color: '#16a34a' }}>~$0.000255</td>
+                    <td style={{ padding: '10px 14px', fontWeight: 700, color: '#15803d' }}>~₹0.02 (2 paise)</td>
                   </tr>
                 </tbody>
               </table>

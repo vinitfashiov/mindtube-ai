@@ -19,9 +19,9 @@ export interface ApiCostSummary {
   logs: ApiUsageLog[];
 }
 
-// Gemini 2.5 / 2.0 Flash Official Pricing Constants
-export const INPUT_TOKEN_COST_PER_MILLION = 0.075; // $0.075 per 1M input tokens
-export const OUTPUT_TOKEN_COST_PER_MILLION = 0.30;  // $0.30 per 1M output tokens
+// Gemini 2.5 Flash Lite Official Pricing Constants (Ultra Low Cost)
+export const INPUT_TOKEN_COST_PER_MILLION = 0.015; // $0.015 per 1M input tokens
+export const OUTPUT_TOKEN_COST_PER_MILLION = 0.060; // $0.060 per 1M output tokens
 export const USD_TO_INR_RATE = 86.5;                // 1 USD = 86.5 INR
 
 export function calculateGeminiCost(inputTokens: number, outputTokens: number) {

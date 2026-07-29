@@ -42,11 +42,12 @@ export async function fetchYouTubeMetadata(youtubeUrl: string) {
   return null;
 }
 
-// Candidate Gemini Models list to try in sequence for maximum compatibility
+// Candidate Gemini Models list to try in sequence for maximum speed & lowest cost
 const MODEL_CANDIDATES = [
+  "gemini-2.5-flash-lite",
+  "gemini-2.0-flash-lite",
   "gemini-2.5-flash",
-  "gemini-2.0-flash",
-  "gemini-1.5-flash"
+  "gemini-2.0-flash"
 ];
 
 // Clean JSON response string from Markdown fence blocks
@@ -840,7 +841,7 @@ Chapters: ${analysis.outline.map(o => o.timestamp + ' ' + o.title).join('; ')}`;
   const fullPrompt = `${systemPrompt}\n\nUser Prompt: "${userQuery}"\n\nProvide a comprehensive, beautifully structured answer.`;
 
   try {
-    const model = ai.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = ai.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
     const result = await model.generateContent([fullPrompt]);
     const res = await result.response;
     const text = res.text() || "I couldn't process your question. Please try again.";
