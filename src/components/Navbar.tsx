@@ -87,7 +87,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: isDesktop ? '12px 24px' : '10px 16px',
-        background: '#ffffff',
+        background: '#fafafa',
         borderBottom: 'none',
         height: 52,
         zIndex: 50,

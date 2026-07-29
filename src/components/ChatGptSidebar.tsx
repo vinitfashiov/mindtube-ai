@@ -64,8 +64,8 @@ export const ChatGptSidebar: React.FC<ChatGptSidebarProps> = ({
       style={{
         width: '100%',
         height: '100%',
-        background: '#f9f9fb',
-        borderRight: '1px solid #eaeaea',
+        background: '#f2f2f4',
+        borderRight: '1px solid #e4e4e7',
         padding: '14px 12px',
         display: 'flex',
         flexDirection: 'column',
