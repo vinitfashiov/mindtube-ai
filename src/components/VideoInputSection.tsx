@@ -20,7 +20,8 @@ import {
   ChevronRight,
   RotateCw,
   Award,
-  Coins
+  Coins,
+  Copy
 } from 'lucide-react';
 import { VideoNoteAnalysis, MasterChatMessage } from '../types/notes';
 import { createSpeechRecognizer, speakNaturalVoice, stopSpeech } from '../services/voiceService';
@@ -424,7 +425,7 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
                   width: '100%'
                 }}
               >
-                {/* Manus Header Row with Avatar & Timestamp */}
+                {/* Header Row with Avatar & Timestamp */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   {msg.sender === 'assistant' ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -440,13 +441,14 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
                     </div>
                   ) : (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#3b82f6', color: '#ffffff', fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        VK
-                      </div>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: '#09090b' }}>You</span>
+                      <span style={{ fontSize: 11, color: '#71717a', fontWeight: 500 }}>
+                        {msg.text.includes('youtube.com') || msg.text.includes('watch?v=') ? '🔒 Youtube Video' : 'You'} • {msg.timestamp}
+                      </span>
                     </div>
                   )}
-                  <span style={{ fontSize: 11, color: '#a1a1aa' }}>• {msg.timestamp}</span>
+                  {msg.sender === 'assistant' && (
+                    <span style={{ fontSize: 11, color: '#a1a1aa' }}>• {msg.timestamp}</span>
+                  )}
 
                   {msg.sender === 'assistant' && !msg.isProcessing && (
                     <button
@@ -461,26 +463,46 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
                   {msg.usageCost && (
                     <span style={{ fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 9999, background: '#f0fdf4', color: '#166534', border: '1px solid #bbf7d0', display: 'inline-flex', alignItems: 'center', gap: 3 }}>
                       <Coins style={{ width: 10, height: 10 }} />
-                      ${msg.usageCost.costUsd.toFixed(4)} (₹{msg.usageCost.costInr.toFixed(2)})
+                      ${msg.usageCost.costUsd.toFixed(4)}
                     </span>
                   )}
                 </div>
 
-                {/* Message Bubble Container (Manus Styling) */}
-                <div
-                  style={{
-                    maxWidth: msg.sender === 'user' ? '85%' : '100%',
-                    width: card ? '100%' : 'auto',
-                    padding: msg.sender === 'user' ? '10px 16px' : '16px 20px',
-                    borderRadius: msg.sender === 'user' ? '16px 16px 4px 16px' : '16px',
-                    background: msg.sender === 'user' ? '#09090b' : '#ffffff',
-                    border: msg.sender === 'user' ? 'none' : '1px solid #e4e4e7',
-                    color: msg.sender === 'user' ? '#ffffff' : '#09090b',
-                    fontSize: 13.5,
-                    lineHeight: 1.55,
-                    boxShadow: msg.sender === 'user' ? '0 2px 8px rgba(0,0,0,0.1)' : '0 1px 3px rgba(0,0,0,0.02)'
-                  }}
-                >
+                {/* Message Content Container (Manus 1:1 Style) */}
+                {msg.sender === 'user' ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, maxWidth: '85%' }}>
+                    {(msg.text.includes('youtube.com') || msg.text.includes('watch?v=')) && (
+                      <div style={{ padding: '8px 12px', borderRadius: 12, background: '#ffffff', border: '1px solid #e4e4e7', display: 'flex', alignItems: 'center', gap: 10, boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
+                        <div style={{ width: 28, height: 28, borderRadius: 6, background: '#fee2e2', color: '#dc2626', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 12 }}>
+                          P
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 12, fontWeight: 600, color: '#09090b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 220 }}>
+                            {msg.text}
+                          </div>
+                          <div style={{ fontSize: 10.5, color: '#71717a' }}>YouTube Video • URL</div>
+                        </div>
+                      </div>
+                    )}
+                    <div style={{ padding: '8px 14px', borderRadius: 12, background: '#ffffff', border: '1px solid #e4e4e7', color: '#09090b', fontSize: 13, boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
+                      {msg.text}
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      maxWidth: '100%',
+                      width: card ? '100%' : 'auto',
+                      padding: '16px 20px',
+                      borderRadius: '16px',
+                      background: '#ffffff',
+                      border: '1px solid #e4e4e7',
+                      color: '#09090b',
+                      fontSize: 13.5,
+                      lineHeight: 1.55,
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.02)'
+                    }}
+                  >
                   {msg.isProcessing ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '4px 0' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#09090b', fontWeight: 600, fontSize: 13 }}>
@@ -492,7 +514,7 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
                         <div>✓ Generating Class Notes PDF, Mindmap & Quiz</div>
                       </div>
                     </div>
-                  ) : msg.sender === 'assistant' ? (
+                  ) : (
                     <div>
                       {renderMasterRichContent(msg.text)}
 
@@ -898,13 +920,27 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
 
                         </div>
                       )}
+
+                      {/* Manus Action Bar (Copy & Regenerate Icons) */}
+                      {!msg.isProcessing && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 10, paddingTop: 4 }}>
+                          <button
+                            onClick={() => navigator.clipboard.writeText(msg.text)}
+                            title="Copy response"
+                            style={{ border: 'none', background: 'transparent', color: '#a1a1aa', cursor: 'pointer', padding: 2 }}
+                            onMouseEnter={(e) => (e.currentTarget.style.color = '#09090b')}
+                            onMouseLeave={(e) => (e.currentTarget.style.color = '#a1a1aa')}
+                          >
+                            <Copy style={{ width: 14, height: 14 }} />
+                          </button>
+                        </div>
+                      )}
                     </div>
-                  ) : (
-                    msg.text
                   )}
                 </div>
-              </div>
-            );
+              )}
+            </div>
+          );
           })}
 
           {isAiResponding && (
