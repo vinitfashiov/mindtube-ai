@@ -10,13 +10,100 @@ import {
   GitFork,
   BookOpen
 } from 'lucide-react';
-import { VideoNoteAnalysis } from '../types/notes';
+import { VideoNoteAnalysis, MindMapNode } from '../types/notes';
 
 interface TreeNotesPdfViewProps {
   analysis: VideoNoteAnalysis;
   onClose: () => void;
   onSwitchStyle?: (style: 'handbook' | 'tree') => void;
 }
+
+// Recursive component to render tree nodes matching exact Revisemap styling
+const RenderTreeNode: React.FC<{ node: MindMapNode; depth?: number }> = ({ node, depth = 0 }) => {
+  if (!node) return null;
+
+  // Level 0: Main Topic Box (Dark Olive Green / Gold border)
+  if (depth === 0) {
+    return (
+      <div style={{ marginBottom: 14 }}>
+        <div style={{
+          background: '#423828',
+          color: '#ffffff',
+          border: '2px solid #a3e635',
+          padding: '6px 12px',
+          fontSize: 14,
+          fontWeight: 800,
+          borderRadius: 4,
+          display: 'inline-block',
+          marginBottom: 6
+        }}>
+          {node.label} {node.details ? `(${node.details})` : ''}
+        </div>
+        {node.children && node.children.length > 0 && (
+          <div style={{ paddingLeft: 6, borderLeft: '2px solid #0284c7', marginLeft: 6 }}>
+            {node.children.map((child) => (
+              <RenderTreeNode key={child.id || child.label} node={child} depth={depth + 1} />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Level 1: Sub-category Header (Green / Blue / Purple badges)
+  if (depth === 1) {
+    const isSpecialCategory = node.label.includes('विशेषताएं') || node.label.includes('परिभाषा') || node.label.includes('महत्व') || node.label.includes('प्रकार');
+    return (
+      <div style={{ marginTop: 8, marginBottom: 6 }}>
+        <div style={{
+          background: isSpecialCategory ? '#15803d' : '#1e1b4b',
+          color: '#ffffff',
+          border: isSpecialCategory ? '1.5px solid #4ade80' : '1.5px solid #38bdf8',
+          padding: '4px 10px',
+          fontSize: 12.5,
+          fontWeight: 800,
+          borderRadius: 4,
+          display: 'inline-block',
+          marginBottom: 4
+        }}>
+          {node.label}
+        </div>
+        {node.details && (
+          <div style={{ fontSize: 11.5, color: '#0369a1', paddingLeft: 8, marginBottom: 2 }}>
+            |_ {node.details}
+          </div>
+        )}
+        {node.children && node.children.length > 0 && (
+          <div style={{ paddingLeft: 8, borderLeft: '2px solid #0284c7', marginLeft: 6 }}>
+            {node.children.map((child) => (
+              <RenderTreeNode key={child.id || child.label} node={child} depth={depth + 1} />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Level 2 & deeper: Leaf nodes with exact |_ branch prefix
+  return (
+    <div style={{ fontSize: 11.5, color: '#1e293b', lineHeight: 1.5, marginTop: 3 }}>
+      <div style={{ display: 'flex', gap: 4, alignItems: 'flex-start' }}>
+        <span style={{ color: '#0284c7', fontWeight: 'bold', fontFamily: 'monospace', flexShrink: 0 }}>|_</span>
+        <div>
+          <strong style={{ color: node.children && node.children.length > 0 ? '#1d4ed8' : '#0f172a' }}>{node.label}</strong>
+          {node.details && <span style={{ color: '#475569', marginLeft: 4 }}>— {node.details}</span>}
+        </div>
+      </div>
+      {node.children && node.children.length > 0 && (
+        <div style={{ paddingLeft: 12, borderLeft: '1.5px solid #cbd5e1', marginLeft: 6, marginTop: 2 }}>
+          {node.children.map((child) => (
+            <RenderTreeNode key={child.id || child.label} node={child} depth={depth + 1} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export const TreeNotesPdfView: React.FC<TreeNotesPdfViewProps> = ({
   analysis,
@@ -75,11 +162,24 @@ export const TreeNotesPdfView: React.FC<TreeNotesPdfViewProps> = ({
     }
   };
 
-  // Convert Outline chapters & Mindmap into Revisemap-style Tree Branches
+  // Extract mindmap tree branches
+  const mindmapRoot = analysis.mindmap || { id: 'root', label: analysis.videoTitle, children: [] };
+  const mindmapBranches = mindmapRoot.children || [];
+  
+  // Also split chapters into tree branches if mindmap is empty
   const chapters = analysis.outline || [];
-  const mindmapBranches = analysis.mindmap?.children || [];
-  const takeaways = analysis.keyTakeaways || [];
-  const vocabulary = analysis.vocabularyTerms || [];
+
+  // Group branches across 3 columns
+  const totalBranches = mindmapBranches.length > 0 ? mindmapBranches : chapters.map((c) => ({
+    id: c.id,
+    label: c.title,
+    details: c.timestamp,
+    children: c.keyPoints.map((kp, kIdx) => ({ id: `${c.id}-${kIdx}`, label: kp }))
+  }));
+
+  const col1 = totalBranches.slice(0, Math.ceil(totalBranches.length / 3));
+  const col2 = totalBranches.slice(Math.ceil(totalBranches.length / 3), Math.ceil((totalBranches.length * 2) / 3));
+  const col3 = totalBranches.slice(Math.ceil((totalBranches.length * 2) / 3));
 
   return (
     <div className={`pdf-modal-overlay ${themeMode === 'light' ? 'light-pdf-mode' : 'dark-pdf-mode'}`}>
@@ -227,7 +327,7 @@ export const TreeNotesPdfView: React.FC<TreeNotesPdfViewProps> = ({
           border: '2px solid #0d9488',
           borderRadius: 8,
           boxShadow: '0 10px 30px rgba(0,0,0,0.06)',
-          fontFamily: 'serif',
+          fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
           position: 'relative'
         }}
       >
@@ -243,18 +343,11 @@ export const TreeNotesPdfView: React.FC<TreeNotesPdfViewProps> = ({
             YouTube Video To PDF
           </h1>
           <div style={{ fontSize: 16, fontWeight: 700, color: '#fef08a', marginTop: 4 }}>
-            mindtube.ai • Tree Revision Map
+            revisemap.com • mindtube.ai
           </div>
         </div>
 
-        {/* VIDEO TITLE METADATA BAR */}
-        <div style={{ background: '#f8fafc', borderBottom: '1px solid #cbd5e1', padding: '10px 20px', fontSize: 12, color: '#334155', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
-          <div><strong>Topic:</strong> {analysis.videoTitle}</div>
-          {analysis.channelName && <div><strong>Creator:</strong> {analysis.channelName}</div>}
-          <div><strong>Date:</strong> {new Date().toLocaleDateString()}</div>
-        </div>
-
-        {/* 3-COLUMN TREE CONTAINER */}
+        {/* 3-COLUMN TREE CONTAINER (EXACT REVISEMAP MATCH) */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: window.innerWidth < 768 ? '1fr' : 'repeat(3, 1fr)',
@@ -262,146 +355,36 @@ export const TreeNotesPdfView: React.FC<TreeNotesPdfViewProps> = ({
           padding: '20px 16px',
           alignItems: 'start'
         }}>
-          {/* COLUMN 1: Chapter Outlines */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            {chapters.slice(0, Math.ceil(chapters.length / 2)).map((chap, cIdx) => (
-              <div key={cIdx} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                {/* Level 1 Purple Badge Header */}
-                <div style={{
-                  background: '#581c87',
-                  color: '#ffffff',
-                  border: '1.5px solid #f59e0b',
-                  padding: '5px 10px',
-                  fontSize: 13,
-                  fontWeight: 800,
-                  borderRadius: 4
-                }}>
-                  Chapter {cIdx + 1}: {chap.title}
-                </div>
-
-                {/* Sub-branch Tree Lines */}
-                <div style={{ paddingLeft: 8, borderLeft: '2px solid #2563eb', marginLeft: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <div style={{ fontSize: 11.5, fontWeight: 700, color: '#1d4ed8' }}>
-                    |_ Timestamp: {chap.timestamp}
-                  </div>
-                  <div style={{ fontSize: 11.5, color: '#1e293b', lineHeight: 1.45 }}>
-                    |_ {chap.summary}
-                  </div>
-
-                  {chap.keyPoints?.map((kp, kIdx) => (
-                    <div key={kIdx} style={{ fontSize: 11, color: '#334155', lineHeight: 1.4, paddingLeft: 6 }}>
-                      |__ {kp}
-                    </div>
-                  ))}
-                </div>
-              </div>
+          {/* COLUMN 1 */}
+          <div>
+            {col1.map((branch) => (
+              <RenderTreeNode key={branch.id || branch.label} node={branch as MindMapNode} depth={0} />
             ))}
           </div>
 
-          {/* COLUMN 2: Rest of Chapters & Mindmap Branches */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            {chapters.slice(Math.ceil(chapters.length / 2)).map((chap, cIdx) => (
-              <div key={cIdx + 100} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <div style={{
-                  background: '#581c87',
-                  color: '#ffffff',
-                  border: '1.5px solid #f59e0b',
-                  padding: '5px 10px',
-                  fontSize: 13,
-                  fontWeight: 800,
-                  borderRadius: 4
-                }}>
-                  Chapter {Math.ceil(chapters.length / 2) + cIdx + 1}: {chap.title}
-                </div>
-
-                <div style={{ paddingLeft: 8, borderLeft: '2px solid #2563eb', marginLeft: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <div style={{ fontSize: 11.5, fontWeight: 700, color: '#1d4ed8' }}>
-                    |_ Timestamp: {chap.timestamp}
-                  </div>
-                  <div style={{ fontSize: 11.5, color: '#1e293b', lineHeight: 1.45 }}>
-                    |_ {chap.summary}
-                  </div>
-
-                  {chap.keyPoints?.map((kp, kIdx) => (
-                    <div key={kIdx} style={{ fontSize: 11, color: '#334155', lineHeight: 1.4, paddingLeft: 6 }}>
-                      |__ {kp}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-
-            {/* Mindmap Concept Tree Nodes */}
-            {mindmapBranches.map((branch, bIdx) => (
-              <div key={bIdx} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <div style={{
-                  background: '#1e1b4b',
-                  color: '#ffffff',
-                  border: '1.5px solid #38bdf8',
-                  padding: '5px 10px',
-                  fontSize: 12.5,
-                  fontWeight: 800,
-                  borderRadius: 4
-                }}>
-                  {branch.label}
-                </div>
-                <div style={{ paddingLeft: 8, borderLeft: '2px solid #0284c7', marginLeft: 8, display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  {branch.details && <div style={{ fontSize: 11.5, color: '#0369a1' }}>|_ {branch.details}</div>}
-                  {branch.children?.map((sub, sIdx) => (
-                    <div key={sIdx} style={{ fontSize: 11, color: '#334155' }}>
-                      |__ {sub.label}
-                      {sub.details && <span style={{ color: '#64748b' }}> ({sub.details})</span>}
-                    </div>
-                  ))}
-                </div>
-              </div>
+          {/* COLUMN 2 */}
+          <div>
+            {col2.map((branch) => (
+              <RenderTreeNode key={branch.id || branch.label} node={branch as MindMapNode} depth={0} />
             ))}
           </div>
 
-          {/* COLUMN 3: Key Principles, Glossary & Exam Traps */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            {/* Key Academic Takeaways */}
-            {takeaways.length > 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <div style={{
-                  background: '#831843',
-                  color: '#ffffff',
-                  border: '1.5px solid #f43f5e',
-                  padding: '5px 10px',
-                  fontSize: 13,
-                  fontWeight: 800,
-                  borderRadius: 4
-                }}>
-                  Key Exam Principles ({takeaways.length})
-                </div>
-                <div style={{ paddingLeft: 8, borderLeft: '2px solid #be123c', marginLeft: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  {takeaways.map((t, idx) => (
-                    <div key={idx} style={{ fontSize: 11.5, color: '#1e293b', lineHeight: 1.4 }}>
-                      <strong style={{ color: '#be123c' }}>|_ {t.title}:</strong> {t.description}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+          {/* COLUMN 3 */}
+          <div>
+            {col3.map((branch) => (
+              <RenderTreeNode key={branch.id || branch.label} node={branch as MindMapNode} depth={0} />
+            ))}
 
-            {/* Glossary Terms */}
-            {vocabulary.length > 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <div style={{
-                  background: '#166534',
-                  color: '#ffffff',
-                  border: '1.5px solid #86efac',
-                  padding: '5px 10px',
-                  fontSize: 13,
-                  fontWeight: 800,
-                  borderRadius: 4
-                }}>
-                  Key Terms Glossary
+            {/* Supplementary Glossary / Traps if available */}
+            {analysis.vocabularyTerms && analysis.vocabularyTerms.length > 0 && (
+              <div style={{ marginTop: 14 }}>
+                <div style={{ background: '#166534', color: '#ffffff', border: '1.5px solid #86efac', padding: '4px 10px', fontSize: 12.5, fontWeight: 800, borderRadius: 4, display: 'inline-block', marginBottom: 6 }}>
+                  शब्दकोश (Glossary)
                 </div>
-                <div style={{ paddingLeft: 8, borderLeft: '2px solid #16a34a', marginLeft: 8, display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  {vocabulary.map((v, idx) => (
-                    <div key={idx} style={{ fontSize: 11, color: '#14532d', lineHeight: 1.4 }}>
-                      <strong>|_ {v.term}:</strong> {v.definition}
+                <div style={{ paddingLeft: 8, borderLeft: '2px solid #16a34a', marginLeft: 6, display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  {analysis.vocabularyTerms.slice(0, 10).map((v, idx) => (
+                    <div key={idx} style={{ fontSize: 11, color: '#14532d' }}>
+                      |_ <strong>{v.term}:</strong> {v.definition}
                     </div>
                   ))}
                 </div>
@@ -420,7 +403,7 @@ export const TreeNotesPdfView: React.FC<TreeNotesPdfViewProps> = ({
           fontWeight: 700,
           borderTop: '2px solid #0f766e'
         }}>
-          mindtube.ai • This is a class notes pdf. It may contain class info. [Not for sale]
+          revisemap.com • This is a class notes pdf. It may contains class info. [Not for sale]
         </div>
       </div>
     </div>
