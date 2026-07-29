@@ -637,30 +637,25 @@ I am analyzing the specific YouTube video:
 - Channel: "${realChannel}"
 - Video URL: "${youtubeUrl}" (ID: "${videoId}")
 
-ABSOLUTE CRITICAL INSTRUCTION:
-Perform an UNCOMPRESSED, EXHAUSTIVE, ACADEMIC MASTERPIECE SYNTHESIS of this exact video ("${realTitle}").
-You MUST extract EVERY SINGLE POINT, concept, example, case study, formula, code snippet, technique, tip, and piece of information from this video.
-DO NOT summarize loosely. DO NOT shorten. DO NOT skip anything.
-Write COMPLETE, HIGH-DENSITY, MULTI-PARAGRAPH notes so that a student reading only your notes gets 100% of the video's value — as if they watched the entire video twice.
-The output should be SO DETAILED that it could fill 15-25 printed pages.
-
-CONTENT DENSITY RULES:
-- overallSummary: Write 8-12 comprehensive sentences covering EVERY major theme, technique, and outcome from the video.
-- keyTakeaways: Generate 8-15 takeaways. Each MUST have a 5-6 sentence deep explanation with examples.
-- outline: Break the video into EVERY chapter/section (aim for 8-15 chapters). Each chapter MUST have:
-  * A detailed multi-paragraph summary (4-8 sentences minimum)
-  * 5-10 key points per chapter
-  * Code snippets if technical content is discussed
-  * Pro tips specific to that chapter
-- detailedNotes: Write EXHAUSTIVE long-form lecture notes (3000-6000 words) covering the ENTIRE video content chapter by chapter. Use markdown formatting with ## headings, bullet points, bold terms, and code blocks. This is the MOST IMPORTANT field — it should read like a complete textbook chapter.
-- flashcards: Generate 20-30 flashcards covering every concept, term, technique, and fact from the video.
-- quiz: Generate 20-25 MCQ questions with 4 options each, covering all topics from the video.
-- mindmap: Create a deep 4-level hierarchy with every sub-concept mapped out.
-- vocabularyTerms: Extract 10-20 key technical terms with precise definitions.
-- formulasAndEquations: Extract any math formulas, equations, algorithms, or technical rules mentioned.
-- proTipsGlobal: 5-8 actionable pro tips.
-- trapsToAvoidGlobal: 5-8 common mistakes/pitfalls.
-- mentalModels: 3-5 mental models or frameworks from the video.
+ABSOLUTE CRITICAL INSTRUCTIONS & ACCURACY AUDIT:
+1. ACCURACY & CONSISTENCY FIRST (Zero Contradictions): Cross-check every single scientific term and statement across all sections. For example, if Planaria is mentioned, classify its reproduction mode (Regeneration) consistently across notes, flashcards, and MCQs without contradictory claims.
+2. NO REPETITION ACROSS SECTIONS:
+   - Summary: Keywords & thesis only.
+   - Level 1 Quick Revision Map: Ultra-compressed keywords, key examples, and common traps.
+   - Level 2 Smart Notes: Definitions, comparisons, processes, and exam facts.
+   - Level 3 Detailed Notes: Exhaustive lecture notes with source tags ([FROM VIDEO], [TEACHER EXAMPLE], [AI EXPLANATION]).
+   - Flashcards: Direct active recall questions across 5 cognitive levels (Recall, Difference, Why, Application, Error Detection).
+   - MCQs: Application-based questions (40% Easy, 40% Medium, 20% Hard).
+3. THREE-LEVEL NOTES SYSTEM:
+   - quickRevisionMap: Markdown single-page rapid revision map (max 400 words).
+   - smartRevisionNotes: Markdown 3-5 page structured revision notes with comparison tables & flowcharts (max 2000 words).
+   - detailedNotes: Markdown long-form lecture notes with source tags (max 4000 words).
+4. COMPARISON TABLES & TEACHER EMPHASIS:
+   - comparisonTables: Extract side-by-side comparative matrices (e.g. Asexual vs Sexual Reproduction, Binary Fission vs Fragmentation).
+   - teacherEmphasis: Highlight teacher cues like "🔥 Most Important", "⚠️ Common Confusion", "🧠 Mnemonic", "✍️ Exam Answer", "🎯 PYQ Concept", "📌 Teacher Repeated".
+5. UNBIASED PRACTICE TEST & SEPARATE ANSWER KEY:
+   - quiz: Questions and options ONLY (so students can test themselves without seeing answers immediately).
+   - mcqAnswerKey: Separate answer key containing correct option, explanation, and why other options are wrong.
 
 ${isHindi ? '- CRITICAL LANGUAGE INSTRUCTION: Generate all text in HINDI (हिन्दी). Use Devanagari script for Hindi text, with technical terminology (like Python, React, Code, Physics) written naturally in English.' : ''}
 
@@ -670,19 +665,38 @@ You MUST strictly return ONLY raw valid JSON matching this schema:
   "channelName": "${realChannel.replace(/"/g, '\\"')}",
   "duration": "Estimated length",
   "overallSummary": "Comprehensive 8-12 sentence deep executive synthesis covering every major theme.",
-  "mentalModels": ["Model 1", "Model 2", "Model 3", "Model 4", "Model 5"],
-  "proTipsGlobal": ["Pro Tip 1", "Pro Tip 2", "Pro Tip 3", "Pro Tip 4", "Pro Tip 5"],
-  "trapsToAvoidGlobal": ["Trap 1", "Trap 2", "Trap 3", "Trap 4", "Trap 5"],
-  "detailedNotes": "## Chapter 1: Title\\n\\nLong detailed paragraph...\\n\\n## Chapter 2: Title\\n\\nLong detailed paragraph... (3000-6000 words total, markdown formatted)",
-  "vocabularyTerms": [
-    { "term": "Technical Term", "definition": "Precise 2-3 sentence definition with context" }
+  "quickRevisionMap": "## ⚡ Level 1: 5-Minute Rapid Revision Map\\n\\n### Key Terms & Formulas\\n- Term 1: Short summary...\\n\\n### Core Examples\\n- Example 1...\\n\\n### Top 3 Exam Traps\\n- Trap 1...",
+  "smartRevisionNotes": "## 📖 Level 2: Smart Study Notes\\n\\n### Key Definitions\\n...\\n\\n### Core Processes\\n...",
+  "detailedNotes": "## 📚 Level 3: Exhaustive Lecture Notes\\n\\n### Chapter 1: Title\\n[FROM VIDEO] Detail...\\n[TEACHER EXAMPLE] Example...\\n[AI EXPLANATION] Context...",
+  "comparisonTables": [
+    {
+      "title": "Asexual Reproduction vs Sexual Reproduction",
+      "headers": ["Asexual Reproduction", "Sexual Reproduction"],
+      "rows": [
+        ["Single parent involved", "Two parents involved"],
+        ["No gamete formation", "Gamete formation occurs"]
+      ]
+    }
   ],
-  "formulasAndEquations": ["Formula 1: description", "Formula 2: description"],
+  "teacherEmphasis": [
+    {
+      "text": "Planaria reproduces via Regeneration, NOT Fragmentation",
+      "tag": "⚠️ Common Confusion",
+      "timestamp": "08:42"
+    }
+  ],
+  "mentalModels": ["Model 1", "Model 2", "Model 3"],
+  "proTipsGlobal": ["Pro Tip 1", "Pro Tip 2"],
+  "trapsToAvoidGlobal": ["Trap 1", "Trap 2"],
+  "vocabularyTerms": [
+    { "term": "Regeneration", "definition": "Ability of an organism to regrow lost body parts into a complete organism (e.g. Planaria)." }
+  ],
+  "formulasAndEquations": ["Formula 1: Description"],
   "keyTakeaways": [
     {
       "id": "kt-1",
       "title": "High-impact takeaway title",
-      "description": "Deep 5-6 sentence explanation with examples and context",
+      "description": "Deep explanation with context",
       "tag": "Category Tag",
       "impact": "Critical"
     }
@@ -692,15 +706,9 @@ You MUST strictly return ONLY raw valid JSON matching this schema:
       "id": "out-1",
       "timestamp": "00:00 - 04:00",
       "title": "Granular Chapter Title",
-      "summary": "Detailed 4-8 sentence technical summary covering everything discussed",
-      "keyPoints": ["Point 1 with detail", "Point 2 with detail", "Point 3", "Point 4", "Point 5"],
-      "codeSnippets": [
-        {
-          "language": "bash",
-          "code": "code snippet",
-          "explanation": "explanation"
-        }
-      ]
+      "summary": "Detailed technical summary",
+      "keyPoints": ["Point 1", "Point 2"],
+      "codeSnippets": []
     }
   ],
   "mindmap": {
@@ -709,48 +717,38 @@ You MUST strictly return ONLY raw valid JSON matching this schema:
     "category": "Root Subject",
     "color": "#6366f1",
     "details": "Central core topic",
-    "children": [
-      {
-        "id": "m-1",
-        "label": "1. Major Concept",
-        "category": "Main Branch",
-        "color": "#3b82f6",
-        "details": "Overview",
-        "children": [
-          {
-            "id": "m-1-1",
-            "label": "Subtopic A",
-            "details": "Detail",
-            "children": [
-              { "id": "m-1-1-1", "label": "Key Detail 1", "details": "Specific" }
-            ]
-          }
-        ]
-      }
-    ]
+    "children": []
   },
   "flashcards": [
     {
       "id": "fc-1",
-      "topic": "Topic Name",
-      "question": "Active recall question",
-      "answer": "Detailed answer with reasoning (3-4 sentences)",
-      "difficulty": "Hard"
+      "topic": "Reproduction",
+      "question": "Does Planaria reproduce via fragmentation or regeneration?",
+      "answer": "Regeneration. Each cut piece can grow into a complete Planaria.",
+      "difficulty": "Medium",
+      "cognitiveLevel": "Difference"
     }
   ],
   "quiz": [
     {
       "id": "qz-1",
-      "question": "Scenario question testing deep understanding",
-      "options": ["Option A", "Option B", "Option C", "Option D"],
-      "correctOptionIndex": 0,
-      "explanation": "Detailed rationale explanation (2-3 sentences)",
-      "category": "Category"
+      "question": "Which organism reproduces through regeneration?",
+      "options": ["Amoeba", "Spirogyra", "Planaria", "Hydra"],
+      "correctOptionIndex": 2,
+      "explanation": "Planaria has specialized cells for regeneration.",
+      "difficulty": "Medium",
+      "category": "Reproduction"
+    }
+  ],
+  "mcqAnswerKey": [
+    {
+      "questionIndex": 0,
+      "correctOption": "C. Planaria",
+      "explanation": "Planaria contains specialized cells capable of proliferation and differentiation into complete organism parts.",
+      "whyOthersWrong": "Amoeba reproduces by Binary Fission; Spirogyra by Fragmentation; Hydra primarily by Budding."
     }
   ]
 }
-
-REMEMBER: Generate MAXIMUM content. Every concept, every example, every detail from "${realTitle}" must be captured. The detailedNotes field alone should be 3000-6000 words. Do NOT truncate or shorten anything.
 `;
 
   const ai = new GoogleGenerativeAI(apiKey.trim());
@@ -765,7 +763,7 @@ REMEMBER: Generate MAXIMUM content. Every concept, every example, every detail f
         model: modelName,
         generationConfig: {
           responseMimeType: "application/json",
-          temperature: 0.3,
+          temperature: 0.2,
           maxOutputTokens: 65536
         }
       });
@@ -794,7 +792,7 @@ REMEMBER: Generate MAXIMUM content. Every concept, every example, every detail f
         channelName: parsedData.channelName || realChannel,
         duration: parsedData.duration || "N/A",
         createdAt: new Date().toISOString(),
-        language: "en",
+        language: targetLanguage,
         overallSummary: parsedData.overallSummary || `Summary for ${realTitle}`,
         mentalModels: parsedData.mentalModels || [],
         proTipsGlobal: parsedData.proTipsGlobal || [],
@@ -804,9 +802,14 @@ REMEMBER: Generate MAXIMUM content. Every concept, every example, every detail f
         mindmap: parsedData.mindmap || { id: "root", label: realTitle },
         flashcards: parsedData.flashcards || [],
         quiz: parsedData.quiz || [],
+        quickRevisionMap: parsedData.quickRevisionMap || '',
+        smartRevisionNotes: parsedData.smartRevisionNotes || '',
         detailedNotes: parsedData.detailedNotes || '',
+        comparisonTables: parsedData.comparisonTables || [],
+        teacherEmphasis: parsedData.teacherEmphasis || [],
         vocabularyTerms: parsedData.vocabularyTerms || [],
         formulasAndEquations: parsedData.formulasAndEquations || [],
+        mcqAnswerKey: parsedData.mcqAnswerKey || [],
         usageCost: {
           inputTokens,
           outputTokens,

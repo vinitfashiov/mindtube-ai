@@ -6,7 +6,6 @@ import {
   X,
   Sparkles,
   BookOpen,
-  AlertTriangle,
   ArrowLeft,
   GitFork,
   BrainCircuit,
@@ -15,7 +14,13 @@ import {
   Download,
   BookMarked,
   FlaskConical,
-  List
+  List,
+  Copy,
+  Check,
+  Zap,
+  Flame,
+  HelpCircle,
+  Table as TableIcon
 } from 'lucide-react';
 import { VideoNoteAnalysis } from '../types/notes';
 
@@ -24,7 +29,7 @@ interface ClassNotesPdfViewProps {
   onClose: () => void;
 }
 
-// Simple markdown renderer for detailedNotes
+// Custom Markdown Renderer with Source Tags & Inline Formatting
 function renderMarkdownText(text: string): React.ReactNode {
   if (!text) return null;
   const lines = text.split('\n');
@@ -36,28 +41,28 @@ function renderMarkdownText(text: string): React.ReactNode {
       elements.push(<div key={i} style={{ height: 8 }} />);
     } else if (trimmed.startsWith('## ')) {
       elements.push(
-        <h3 key={i} style={{ fontSize: 16, fontWeight: 800, color: '#1e293b', margin: '18px 0 8px 0', borderBottom: '2px solid #e2e8f0', paddingBottom: 6 }}>
+        <h3 key={i} style={{ fontSize: 15, fontWeight: 800, color: '#1e293b', margin: '16px 0 8px 0', borderBottom: '2px solid #e2e8f0', paddingBottom: 5 }}>
           {trimmed.replace('## ', '')}
         </h3>
       );
     } else if (trimmed.startsWith('### ')) {
       elements.push(
-        <h4 key={i} style={{ fontSize: 14, fontWeight: 700, color: '#334155', margin: '12px 0 6px 0' }}>
+        <h4 key={i} style={{ fontSize: 13.5, fontWeight: 700, color: '#334155', margin: '12px 0 6px 0' }}>
           {trimmed.replace('### ', '')}
         </h4>
       );
     } else if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
       elements.push(
-        <div key={i} style={{ fontSize: 13, color: '#334155', lineHeight: 1.65, paddingLeft: 16, marginBottom: 3, display: 'flex', gap: 6 }}>
+        <div key={i} style={{ fontSize: 13, color: '#1e293b', lineHeight: 1.7, paddingLeft: 14, marginBottom: 4, display: 'flex', gap: 6, alignItems: 'flex-start' }}>
           <span style={{ color: '#2563eb', fontWeight: 700, flexShrink: 0 }}>•</span>
           <span dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(trimmed.substring(2)) }} />
         </div>
       );
     } else if (trimmed.startsWith('```')) {
-      // Skip code fence markers
+      // Skip raw code fence markers
     } else {
       elements.push(
-        <p key={i} style={{ fontSize: 13, color: '#334155', lineHeight: 1.7, marginBottom: 6, textAlign: 'justify' }}
+        <p key={i} style={{ fontSize: 13, color: '#1e293b', lineHeight: 1.75, marginBottom: 6, textAlign: 'justify' }}
           dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(trimmed) }}
         />
       );
@@ -68,8 +73,15 @@ function renderMarkdownText(text: string): React.ReactNode {
 }
 
 function formatInlineMarkdown(text: string): string {
+  let result = text;
+  // Source tags
+  result = result.replace(/\[FROM VIDEO\]/gi, '<span style="background:#eff6ff;color:#1d4ed8;font-weight:700;font-size:10px;padding:2px 6px;border-radius:4px;margin-right:6px;border:1px solid #bfdbfe">From Video</span>');
+  result = result.replace(/\[TEACHER EXAMPLE\]/gi, '<span style="background:#fef3c7;color:#b45309;font-weight:700;font-size:10px;padding:2px 6px;border-radius:4px;margin-right:6px;border:1px solid #fde68a">Teacher Example</span>');
+  result = result.replace(/\[AI EXPLANATION\]/gi, '<span style="background:#f3e8ff;color:#6d28d9;font-weight:700;font-size:10px;padding:2px 6px;border-radius:4px;margin-right:6px;border:1px solid #ddd6fe">AI Explanation</span>');
+  result = result.replace(/\[EXAM FACT\]/gi, '<span style="background:#f0fdf4;color:#15803d;font-weight:700;font-size:10px;padding:2px 6px;border-radius:4px;margin-right:6px;border:1px solid #bbf7d0">Exam Fact</span>');
+
   // Bold **text**
-  let result = text.replace(/\*\*(.*?)\*\*/g, '<strong style="color:#0f172a;font-weight:700">$1</strong>');
+  result = result.replace(/\*\*(.*?)\*\*/g, '<strong style="color:#0f172a;font-weight:700">$1</strong>');
   // Inline code `code`
   result = result.replace(/`([^`]+)`/g, '<code style="background:#f1f5f9;padding:1px 5px;border-radius:4px;font-family:Consolas,monospace;font-size:12px;color:#7c3aed">$1</code>');
   return result;
@@ -81,7 +93,19 @@ export const ClassNotesPdfView: React.FC<ClassNotesPdfViewProps> = ({
 }) => {
   const [themeMode, setThemeMode] = useState<'light' | 'dark'>('light');
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
   const pdfContentRef = useRef<HTMLDivElement>(null);
+
+  const handleCopyNotes = () => {
+    let fullText = `${analysis.videoTitle}\n${analysis.videoUrl}\n\n`;
+    if (analysis.quickRevisionMap) fullText += `=== RAPID REVISION MAP ===\n${analysis.quickRevisionMap}\n\n`;
+    if (analysis.smartRevisionNotes) fullText += `=== SMART STUDY NOTES ===\n${analysis.smartRevisionNotes}\n\n`;
+    if (analysis.detailedNotes) fullText += `=== EXHAUSTIVE LECTURE NOTES ===\n${analysis.detailedNotes}\n\n`;
+    
+    navigator.clipboard.writeText(fullText);
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+  };
 
   const handleDownloadPdf = async () => {
     if (!pdfContentRef.current || isDownloading) return;
@@ -90,10 +114,10 @@ export const ClassNotesPdfView: React.FC<ClassNotesPdfViewProps> = ({
     try {
       const html2pdf = (await import('html2pdf.js')).default;
       const element = pdfContentRef.current;
-      const filename = `MindTube_Notes_${analysis.videoTitle.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50)}.pdf`;
+      const filename = `MindTube_Notes_${analysis.videoTitle.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 40)}.pdf`;
 
       const opt = {
-        margin: [10, 12, 10, 12] as [number, number, number, number],
+        margin: [8, 10, 8, 10] as [number, number, number, number],
         filename,
         image: { type: 'jpeg' as const, quality: 0.98 },
         html2canvas: { scale: 2, useCORS: true, logging: false },
@@ -104,18 +128,18 @@ export const ClassNotesPdfView: React.FC<ClassNotesPdfViewProps> = ({
       await html2pdf().set(opt).from(element).save();
     } catch (err) {
       console.error('PDF download failed:', err);
-      // Fallback to print
       window.print();
     } finally {
       setIsDownloading(false);
     }
   };
 
-  // Count total content items
+  // Content Counters
   const totalFlashcards = analysis.flashcards?.length || 0;
   const totalQuiz = analysis.quiz?.length || 0;
   const totalChapters = analysis.outline?.length || 0;
   const totalVocab = analysis.vocabularyTerms?.length || 0;
+  const totalTables = analysis.comparisonTables?.length || 0;
 
   return (
     <div className={`pdf-modal-overlay ${themeMode === 'light' ? 'light-pdf-mode' : 'dark-pdf-mode'}`}>
@@ -156,13 +180,33 @@ export const ClassNotesPdfView: React.FC<ClassNotesPdfViewProps> = ({
               <FileDown style={{ width: 15, height: 15 }} />
             </div>
             <div style={{ fontSize: 13, fontWeight: 800, color: themeMode === 'light' ? '#0f172a' : '#f8fafc' }}>
-              MindTube PDF Handbook
+              MindTube Study Handbook
             </div>
           </div>
         </div>
 
         {/* Row 2 / Controls */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: window.innerWidth < 640 ? 'space-between' : 'flex-end', width: window.innerWidth < 640 ? '100%' : 'auto' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', justifyContent: window.innerWidth < 640 ? 'space-between' : 'flex-end', width: window.innerWidth < 640 ? '100%' : 'auto' }}>
+          {/* Copy Notes Text */}
+          <button
+            onClick={handleCopyNotes}
+            style={{
+              padding: '6px 12px',
+              borderRadius: 9999,
+              background: isCopied ? '#f0fdf4' : '#f8fafc',
+              border: isCopied ? '1px solid #bbf7d0' : '1px solid #cbd5e1',
+              color: isCopied ? '#15803d' : '#0f172a',
+              fontSize: 11.5,
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5
+            }}
+          >
+            {isCopied ? <Check style={{ width: 13, height: 13, color: '#16a34a' }} /> : <Copy style={{ width: 13, height: 13 }} />}
+            <span>{isCopied ? 'Copied!' : 'Copy Notes'}</span>
+          </button>
+
           {/* Theme Mode Toggle */}
           <button
             onClick={() => setThemeMode(themeMode === 'light' ? 'dark' : 'light')}
@@ -180,7 +224,7 @@ export const ClassNotesPdfView: React.FC<ClassNotesPdfViewProps> = ({
             }}
           >
             {themeMode === 'light' ? <Moon style={{ width: 13, height: 13, color: '#7c3aed' }} /> : <Sun style={{ width: 13, height: 13, color: '#f59e0b' }} />}
-            <span>{themeMode === 'light' ? 'Night Mode' : 'Light Mode'}</span>
+            <span>{themeMode === 'light' ? 'Night' : 'Light'}</span>
           </button>
 
           {/* Direct PDF Download Button */}
@@ -221,13 +265,13 @@ export const ClassNotesPdfView: React.FC<ClassNotesPdfViewProps> = ({
         {/* ===== COVER PAGE / TITLE HEADER ===== */}
         <header className="pdf-header-banner">
           <div style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, color: '#0d9488', marginBottom: 4 }}>
-            Exhaustive Academic Study Guide & Comprehensive Revision Handbook
+            Zero-Contradiction Academic Study Handbook & Complete Exam Companion
           </div>
           <h1 className="pdf-header-title">
             Master Class Notes Handbook
           </h1>
           <div className="pdf-header-subtitle">
-            MindTube AI Student Preparation Engine • mindtube.ai
+            MindTube AI Academic Engine • mindtube.ai
           </div>
         </header>
 
@@ -239,15 +283,20 @@ export const ClassNotesPdfView: React.FC<ClassNotesPdfViewProps> = ({
           <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap', fontSize: 12, color: '#475569' }}>
             {analysis.channelName && <span><strong>Channel / Creator:</strong> {analysis.channelName}</span>}
             {analysis.duration && <span><strong>Video Duration:</strong> {analysis.duration}</span>}
-            <span><strong>Date Generated:</strong> {new Date().toLocaleDateString()}</span>
+            <span><strong>Generated:</strong> {new Date().toLocaleDateString()}</span>
           </div>
           <div style={{ fontSize: 11, color: '#64748b', marginTop: 6, wordBreak: 'break-all' }}>
             <strong>Source Video Link:</strong> {analysis.videoUrl}
           </div>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 10, fontSize: 11 }}>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 10, fontSize: 11 }}>
             <span style={{ padding: '2px 10px', borderRadius: 9999, background: '#eff6ff', border: '1px solid #bfdbfe', color: '#1d4ed8', fontWeight: 700 }}>
               {totalChapters} Chapters
             </span>
+            {totalTables > 0 && (
+              <span style={{ padding: '2px 10px', borderRadius: 9999, background: '#f0fdf4', border: '1px solid #bbf7d0', color: '#15803d', fontWeight: 700 }}>
+                {totalTables} Comparison Tables
+              </span>
+            )}
             <span style={{ padding: '2px 10px', borderRadius: 9999, background: '#fff7ed', border: '1px solid #fed7aa', color: '#c2410c', fontWeight: 700 }}>
               {totalFlashcards} Flashcards
             </span>
@@ -263,38 +312,42 @@ export const ClassNotesPdfView: React.FC<ClassNotesPdfViewProps> = ({
         </div>
 
         {/* ===== TABLE OF CONTENTS ===== */}
-        <div className="pdf-page-break" style={{ padding: 16, borderRadius: 10, background: themeMode === 'light' ? '#f8fafc' : '#1e293b', border: '1px solid #cbd5e1', marginBottom: 24 }}>
+        <div style={{ padding: 16, borderRadius: 10, background: themeMode === 'light' ? '#f8fafc' : '#1e293b', border: '1px solid #cbd5e1', marginBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
             <List style={{ width: 18, height: 18, color: '#2563eb' }} />
-            <h3 style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', margin: 0 }}>Table of Contents</h3>
+            <h3 style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', margin: 0 }}>Handbook Table of Contents</h3>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <div style={{ fontSize: 13, color: '#2563eb', fontWeight: 600 }}>Section 1: Executive Synthesis & Core Mental Models</div>
-            {analysis.detailedNotes && <div style={{ fontSize: 13, color: '#2563eb', fontWeight: 600 }}>Section 2: Comprehensive Detailed Lecture Notes</div>}
-            {totalChapters > 0 && <div style={{ fontSize: 13, color: '#2563eb', fontWeight: 600 }}>Section 3: Granular Chapter Breakdown & Topic Outlines ({totalChapters} Chapters)</div>}
-            {analysis.mindmap && <div style={{ fontSize: 13, color: '#2563eb', fontWeight: 600 }}>Section 4: Hierarchical Concept MindMap Tree</div>}
-            {totalVocab > 0 && <div style={{ fontSize: 13, color: '#2563eb', fontWeight: 600 }}>Section 5: Key Terms Glossary ({totalVocab} Terms)</div>}
-            {analysis.formulasAndEquations && analysis.formulasAndEquations.length > 0 && <div style={{ fontSize: 13, color: '#2563eb', fontWeight: 600 }}>Section 6: Formulas & Equations</div>}
-            {totalFlashcards > 0 && <div style={{ fontSize: 13, color: '#2563eb', fontWeight: 600 }}>Section 7: Active Recall Flashcards ({totalFlashcards} Cards)</div>}
-            {totalQuiz > 0 && <div style={{ fontSize: 13, color: '#2563eb', fontWeight: 600 }}>Section 8: Complete MCQ Exam Practice Test ({totalQuiz} Questions)</div>}
+          <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 640 ? '1fr' : '1fr 1fr', gap: 8 }}>
+            <div style={{ fontSize: 12.5, color: '#2563eb', fontWeight: 600 }}>1. Executive Synthesis & Core Principles</div>
+            {analysis.quickRevisionMap && <div style={{ fontSize: 12.5, color: '#2563eb', fontWeight: 600 }}>2. ⚡ Level 1: Rapid 5-Minute Revision Map</div>}
+            {analysis.smartRevisionNotes && <div style={{ fontSize: 12.5, color: '#2563eb', fontWeight: 600 }}>3. 📖 Level 2: Smart Study Notes</div>}
+            {totalTables > 0 && <div style={{ fontSize: 12.5, color: '#2563eb', fontWeight: 600 }}>4. 📊 Comparative Study Tables</div>}
+            {analysis.teacherEmphasis && analysis.teacherEmphasis.length > 0 && <div style={{ fontSize: 12.5, color: '#2563eb', fontWeight: 600 }}>5. 🔥 Teacher Emphasis & Exam Cues</div>}
+            {analysis.detailedNotes && <div style={{ fontSize: 12.5, color: '#2563eb', fontWeight: 600 }}>6. 📚 Level 3: Exhaustive Lecture Notes</div>}
+            {totalChapters > 0 && <div style={{ fontSize: 12.5, color: '#2563eb', fontWeight: 600 }}>7. Granular Chapter Breakdown</div>}
+            {analysis.mindmap && <div style={{ fontSize: 12.5, color: '#2563eb', fontWeight: 600 }}>8. Concept MindMap Tree</div>}
+            {totalVocab > 0 && <div style={{ fontSize: 12.5, color: '#2563eb', fontWeight: 600 }}>9. Key Terms Glossary ({totalVocab} Terms)</div>}
+            {totalFlashcards > 0 && <div style={{ fontSize: 12.5, color: '#2563eb', fontWeight: 600 }}>10. Active Recall Flashcards ({totalFlashcards} Cards)</div>}
+            {totalQuiz > 0 && <div style={{ fontSize: 12.5, color: '#2563eb', fontWeight: 600 }}>11. MCQ Exam Practice Test (Unsolved)</div>}
+            {analysis.mcqAnswerKey && analysis.mcqAnswerKey.length > 0 && <div style={{ fontSize: 12.5, color: '#2563eb', fontWeight: 600 }}>12. MCQ Answer Key & Explanations</div>}
           </div>
         </div>
 
-        {/* ===== SECTION 1: Executive Synthesis & Mental Models ===== */}
+        {/* ===== SECTION 1: Executive Synthesis ===== */}
         <section className="pdf-section-container">
           <div className="pdf-level-badge level-purple">
             <BookOpen style={{ width: 14, height: 14, display: 'inline', marginRight: 6 }} />
-            SECTION 1: Executive Synthesis & Core Mental Models
+            SECTION 1: Executive Synthesis & Core Principles
           </div>
 
           <div style={{ background: themeMode === 'light' ? '#f8fafc' : '#1e293b', padding: 16, borderRadius: 10, border: '1px solid #cbd5e1', marginBottom: 14 }}>
-            <h3 className="pdf-sub-badge sub-emerald">Deep Executive Summary</h3>
-            <p className="pdf-text-paragraph" style={{ fontSize: 13.5, lineHeight: 1.65 }}>{analysis.overallSummary}</p>
+            <h3 className="pdf-sub-badge sub-emerald">Deep Executive Thesis</h3>
+            <p className="pdf-text-paragraph" style={{ fontSize: 13.5, lineHeight: 1.75 }}>{analysis.overallSummary}</p>
           </div>
 
           {analysis.keyTakeaways && analysis.keyTakeaways.length > 0 && (
             <div style={{ background: themeMode === 'light' ? '#ffffff' : '#0f172a', padding: 16, borderRadius: 10, border: '1px solid #cbd5e1', marginBottom: 14 }}>
-              <h3 className="pdf-sub-badge sub-gold">Key Academic Principles & High-Yield Takeaways ({analysis.keyTakeaways.length})</h3>
+              <h3 className="pdf-sub-badge sub-gold">Key Academic Principles ({analysis.keyTakeaways.length})</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 8 }}>
                 {analysis.keyTakeaways.map((point, idx) => (
                   <div key={idx} style={{ padding: '10px 14px', borderRadius: 8, background: themeMode === 'light' ? '#f8fafc' : '#1e293b', border: '1px solid #e2e8f0' }}>
@@ -306,7 +359,7 @@ export const ClassNotesPdfView: React.FC<ClassNotesPdfViewProps> = ({
                         </span>
                       )}
                     </div>
-                    <p style={{ margin: 0, fontSize: 12.5, color: '#334155', lineHeight: 1.55 }}>
+                    <p style={{ margin: 0, fontSize: 12.5, color: '#1e293b', lineHeight: 1.6 }}>
                       {point.description}
                     </p>
                   </div>
@@ -314,67 +367,106 @@ export const ClassNotesPdfView: React.FC<ClassNotesPdfViewProps> = ({
               </div>
             </div>
           )}
-
-          {/* Mental Models */}
-          {analysis.mentalModels && analysis.mentalModels.length > 0 && (
-            <div style={{ background: '#f0f9ff', border: '1.5px solid #0284c7', padding: 14, borderRadius: 10, marginBottom: 14 }}>
-              <h3 style={{ fontSize: 13, fontWeight: 800, color: '#0369a1', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
-                🧠 Core Mental Models & Frameworks
-              </h3>
-              <ul style={{ paddingLeft: 18, margin: 0 }}>
-                {analysis.mentalModels.map((model, idx) => (
-                  <li key={idx} style={{ fontSize: 12, color: '#0c4a6e', marginBottom: 4, lineHeight: 1.55 }}>
-                    {model}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Golden Rules & Pro Tips */}
-          {analysis.proTipsGlobal && analysis.proTipsGlobal.length > 0 && (
-            <div style={{ background: '#f0fdf4', border: '1.5px solid #16a34a', padding: 14, borderRadius: 10, marginBottom: 14 }}>
-              <h3 style={{ fontSize: 13, fontWeight: 800, color: '#15803d', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
-                <CheckCircle2 style={{ width: 16, height: 16 }} />
-                <span>💡 Golden Rules for Exam Mastery</span>
-              </h3>
-              <ul style={{ paddingLeft: 18, margin: 0 }}>
-                {analysis.proTipsGlobal.map((tip, idx) => (
-                  <li key={idx} style={{ fontSize: 12, color: '#166534', marginBottom: 4, lineHeight: 1.55 }}>
-                    {tip}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Traps & Pitfalls to Avoid */}
-          {analysis.trapsToAvoidGlobal && analysis.trapsToAvoidGlobal.length > 0 && (
-            <div style={{ background: '#fff1f2', border: '1.5px solid #be123c', padding: 14, borderRadius: 10, marginBottom: 14 }}>
-              <h3 style={{ fontSize: 13, fontWeight: 800, color: '#be123c', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
-                <AlertTriangle style={{ width: 16, height: 16 }} />
-                <span>⚠️ Critical Exam Traps & Common Mistakes to Avoid</span>
-              </h3>
-              <ul style={{ paddingLeft: 18, margin: 0 }}>
-                {analysis.trapsToAvoidGlobal.map((trap, idx) => (
-                  <li key={idx} style={{ fontSize: 12, color: '#9f1239', marginBottom: 4, lineHeight: 1.55 }}>
-                    {trap}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
         </section>
 
-        {/* ===== PAGE BREAK ===== */}
-        <div className="pdf-page-break" />
+        {/* ===== LEVEL 1: 5-MINUTE RAPID REVISION MAP ===== */}
+        {analysis.quickRevisionMap && (
+          <section className="pdf-section-container">
+            <div className="pdf-level-badge level-indigo" style={{ background: 'linear-gradient(135deg, #ea580c, #c2410c)' }}>
+              <Zap style={{ width: 14, height: 14, display: 'inline', marginRight: 6 }} />
+              LEVEL 1: 5-Minute Rapid Revision Map (Keywords & Key Traps Only)
+            </div>
+            <div style={{ background: themeMode === 'light' ? '#fff7ed' : '#1e293b', padding: 18, borderRadius: 10, border: '1.5px solid #fed7aa' }}>
+              {renderMarkdownText(analysis.quickRevisionMap)}
+            </div>
+          </section>
+        )}
 
-        {/* ===== SECTION 2: DETAILED LECTURE NOTES (THE BIG ONE) ===== */}
+        {/* ===== LEVEL 2: SMART STUDY NOTES ===== */}
+        {analysis.smartRevisionNotes && (
+          <section className="pdf-section-container">
+            <div className="pdf-level-badge level-indigo">
+              <BookMarked style={{ width: 14, height: 14, display: 'inline', marginRight: 6 }} />
+              LEVEL 2: Smart Revision Notes (Definitions, Comparisons & Exam Facts)
+            </div>
+            <div style={{ background: themeMode === 'light' ? '#ffffff' : '#0f172a', padding: 18, borderRadius: 10, border: '1px solid #cbd5e1' }}>
+              {renderMarkdownText(analysis.smartRevisionNotes)}
+            </div>
+          </section>
+        )}
+
+        {/* ===== COMPARISON TABLES ===== */}
+        {analysis.comparisonTables && analysis.comparisonTables.length > 0 && (
+          <section className="pdf-section-container">
+            <div className="pdf-level-badge level-indigo" style={{ background: '#0284c7' }}>
+              <TableIcon style={{ width: 14, height: 14, display: 'inline', marginRight: 6 }} />
+              Comparative Study Tables ({analysis.comparisonTables.length} Comparisons)
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {analysis.comparisonTables.map((table, tIdx) => (
+                <div key={tIdx} style={{ borderRadius: 10, overflow: 'hidden', border: '1px solid #cbd5e1', background: '#ffffff' }}>
+                  <div style={{ padding: '10px 14px', background: '#f0f9ff', borderBottom: '1px solid #bae6fd', fontSize: 13, fontWeight: 800, color: '#0369a1' }}>
+                    📊 {table.title}
+                  </div>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                    <thead>
+                      <tr style={{ background: '#f8fafc', borderBottom: '1.5px solid #e2e8f0' }}>
+                        <th style={{ padding: '8px 12px', textAlign: 'left', fontWeight: 700, color: '#0f172a', width: '50%' }}>{table.headers[0]}</th>
+                        <th style={{ padding: '8px 12px', textAlign: 'left', fontWeight: 700, color: '#0f172a', width: '50%' }}>{table.headers[1]}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {table.rows.map((row, rIdx) => (
+                        <tr key={rIdx} style={{ borderBottom: rIdx === table.rows.length - 1 ? 'none' : '1px solid #f1f5f9', background: rIdx % 2 === 0 ? '#ffffff' : '#fafafa' }}>
+                          <td style={{ padding: '8px 12px', color: '#1e293b', lineHeight: 1.5 }}>{row[0]}</td>
+                          <td style={{ padding: '8px 12px', color: '#1e293b', lineHeight: 1.5 }}>{row[1]}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ===== TEACHER EMPHASIS & EXAM CUES ===== */}
+        {analysis.teacherEmphasis && analysis.teacherEmphasis.length > 0 && (
+          <section className="pdf-section-container">
+            <div className="pdf-level-badge level-burgundy" style={{ background: '#be123c' }}>
+              <Flame style={{ width: 14, height: 14, display: 'inline', marginRight: 6 }} />
+              Teacher Cues & Exam Emphasis ({analysis.teacherEmphasis.length} Highlights)
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {analysis.teacherEmphasis.map((item, idx) => (
+                <div key={idx} style={{ padding: '10px 14px', borderRadius: 8, background: '#fff1f2', border: '1px solid #fecdd3', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 6, background: '#ffffff', color: '#be123c', border: '1px solid #fda4af' }}>
+                      {item.tag}
+                    </span>
+                    <span style={{ fontSize: 12.5, fontWeight: 600, color: '#881337', lineHeight: 1.4 }}>
+                      {item.text}
+                    </span>
+                  </div>
+                  {item.timestamp && (
+                    <span style={{ fontSize: 11, color: '#9f1239', fontWeight: 700, flexShrink: 0 }}>
+                      ⏱ {item.timestamp}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ===== LEVEL 3: EXHAUSTIVE LECTURE NOTES ===== */}
         {analysis.detailedNotes && (
           <section className="pdf-section-container">
             <div className="pdf-level-badge level-indigo">
               <BookMarked style={{ width: 14, height: 14, display: 'inline', marginRight: 6 }} />
-              SECTION 2: Comprehensive Detailed Lecture Notes
+              LEVEL 3: Exhaustive Lecture Notes (Full Transcript-Based Coverage)
             </div>
             <div style={{ background: themeMode === 'light' ? '#ffffff' : '#0f172a', padding: 20, borderRadius: 10, border: '1px solid #cbd5e1' }}>
               {renderMarkdownText(analysis.detailedNotes)}
@@ -382,15 +474,12 @@ export const ClassNotesPdfView: React.FC<ClassNotesPdfViewProps> = ({
           </section>
         )}
 
-        {/* ===== PAGE BREAK ===== */}
-        {analysis.detailedNotes && <div className="pdf-page-break" />}
-
-        {/* ===== SECTION 3: Granular Chapter Breakdown & Outlines ===== */}
+        {/* ===== GRANULAR CHAPTER BREAKDOWN ===== */}
         {analysis.outline && analysis.outline.length > 0 && (
           <section className="pdf-section-container">
             <div className="pdf-level-badge level-indigo">
               <Sparkles style={{ width: 14, height: 14, display: 'inline', marginRight: 6 }} />
-              SECTION 3: Granular Chapter Breakdown & Complete Topic Outlines ({totalChapters} Chapters)
+              Granular Chapter Breakdown & Outlines ({totalChapters} Chapters)
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -412,13 +501,12 @@ export const ClassNotesPdfView: React.FC<ClassNotesPdfViewProps> = ({
                       <div style={{ fontSize: 11.5, fontWeight: 700, color: '#0f172a', marginBottom: 4 }}>Key Topic Concepts:</div>
                       <ul style={{ paddingLeft: 16, margin: 0 }}>
                         {chap.keyPoints.map((kp, kIdx) => (
-                          <li key={kIdx} style={{ fontSize: 12, color: '#475569', marginBottom: 3, lineHeight: 1.55 }}>{kp}</li>
+                          <li key={kIdx} style={{ fontSize: 12, color: '#334155', marginBottom: 3, lineHeight: 1.55 }}>{kp}</li>
                         ))}
                       </ul>
                     </div>
                   )}
 
-                  {/* Code Snippets if Technical */}
                   {chap.codeSnippets && chap.codeSnippets.length > 0 && (
                     <div style={{ marginTop: 8 }}>
                       {chap.codeSnippets.map((cs, cIdx) => (
@@ -435,15 +523,12 @@ export const ClassNotesPdfView: React.FC<ClassNotesPdfViewProps> = ({
           </section>
         )}
 
-        {/* ===== PAGE BREAK ===== */}
-        {totalChapters > 0 && <div className="pdf-page-break" />}
-
-        {/* ===== SECTION 4: Mindmap Concept Tree ===== */}
+        {/* ===== CONCEPT MINDMAP TREE ===== */}
         {analysis.mindmap && (
           <section className="pdf-section-container">
             <div className="pdf-level-badge level-indigo">
               <GitFork style={{ width: 14, height: 14, display: 'inline', marginRight: 6 }} />
-              SECTION 4: Hierarchical Concept MindMap Tree
+              Hierarchical Concept MindMap Tree
             </div>
 
             <div style={{ padding: 16, borderRadius: 10, background: themeMode === 'light' ? '#f8fafc' : '#1e293b', border: '1px solid #cbd5e1' }}>
@@ -466,16 +551,6 @@ export const ClassNotesPdfView: React.FC<ClassNotesPdfViewProps> = ({
                               ├─ {leaf.label}
                             </span>
                             {leaf.details && <span style={{ fontSize: 11, color: '#6366f1', paddingLeft: 20 }}>{leaf.details}</span>}
-                            {leaf.children && leaf.children.length > 0 && (
-                              <div style={{ paddingLeft: 20 }}>
-                                {leaf.children.map((subLeaf, sIdx) => (
-                                  <div key={sIdx} style={{ fontSize: 11, color: '#475569', paddingLeft: 8 }}>
-                                    └─ {subLeaf.label}
-                                    {subLeaf.details && <span style={{ color: '#94a3b8', marginLeft: 6 }}>— {subLeaf.details}</span>}
-                                  </div>
-                                ))}
-                              </div>
-                            )}
                           </div>
                         ))}
                       </div>
@@ -487,15 +562,12 @@ export const ClassNotesPdfView: React.FC<ClassNotesPdfViewProps> = ({
           </section>
         )}
 
-        {/* ===== PAGE BREAK ===== */}
-        <div className="pdf-page-break" />
-
-        {/* ===== SECTION 5: Key Terms Glossary ===== */}
+        {/* ===== KEY TERMS GLOSSARY ===== */}
         {analysis.vocabularyTerms && analysis.vocabularyTerms.length > 0 && (
           <section className="pdf-section-container">
             <div className="pdf-level-badge level-purple">
               <BookMarked style={{ width: 14, height: 14, display: 'inline', marginRight: 6 }} />
-              SECTION 5: Key Terms Glossary ({totalVocab} Terms)
+              Key Terms Glossary ({totalVocab} Terms)
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -506,7 +578,7 @@ export const ClassNotesPdfView: React.FC<ClassNotesPdfViewProps> = ({
                   </span>
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', marginBottom: 2 }}>{item.term}</div>
-                    <div style={{ fontSize: 12, color: '#475569', lineHeight: 1.5 }}>{item.definition}</div>
+                    <div style={{ fontSize: 12, color: '#334155', lineHeight: 1.5 }}>{item.definition}</div>
                   </div>
                 </div>
               ))}
@@ -514,12 +586,12 @@ export const ClassNotesPdfView: React.FC<ClassNotesPdfViewProps> = ({
           </section>
         )}
 
-        {/* ===== SECTION 6: Formulas & Equations ===== */}
+        {/* ===== FORMULAS & EQUATIONS ===== */}
         {analysis.formulasAndEquations && analysis.formulasAndEquations.length > 0 && (
           <section className="pdf-section-container">
             <div className="pdf-level-badge level-indigo">
               <FlaskConical style={{ width: 14, height: 14, display: 'inline', marginRight: 6 }} />
-              SECTION 6: Formulas, Equations & Technical Rules
+              Formulas, Equations & Technical Rules
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 640 ? '1fr' : '1fr 1fr', gap: 8 }}>
@@ -533,15 +605,12 @@ export const ClassNotesPdfView: React.FC<ClassNotesPdfViewProps> = ({
           </section>
         )}
 
-        {/* ===== PAGE BREAK ===== */}
-        <div className="pdf-page-break" />
-
-        {/* ===== SECTION 7: Active Recall Flashcards Deck ===== */}
+        {/* ===== ACTIVE RECALL FLASHCARDS ===== */}
         {analysis.flashcards && analysis.flashcards.length > 0 && (
           <section className="pdf-section-container">
             <div className="pdf-level-badge level-burgundy">
               <BrainCircuit style={{ width: 14, height: 14, display: 'inline', marginRight: 6 }} />
-              SECTION 7: Active Recall Spaced Repetition Flashcards ({totalFlashcards} Cards)
+              Active Recall Spaced Repetition Flashcards ({totalFlashcards} Cards)
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 640 ? '1fr' : '1fr 1fr', gap: 10 }}>
@@ -551,9 +620,9 @@ export const ClassNotesPdfView: React.FC<ClassNotesPdfViewProps> = ({
                     <div style={{ fontSize: 10.5, fontWeight: 800, textTransform: 'uppercase', color: '#ea580c' }}>
                       Card #{idx + 1} • {card.topic || 'General'}
                     </div>
-                    {card.difficulty && (
-                      <span style={{ fontSize: 9, fontWeight: 700, padding: '1px 6px', borderRadius: 9999, background: card.difficulty === 'Hard' ? '#fef2f2' : card.difficulty === 'Medium' ? '#fff7ed' : '#f0fdf4', color: card.difficulty === 'Hard' ? '#dc2626' : card.difficulty === 'Medium' ? '#c2410c' : '#15803d' }}>
-                        {card.difficulty}
+                    {card.cognitiveLevel && (
+                      <span style={{ fontSize: 9.5, fontWeight: 800, padding: '2px 8px', borderRadius: 9999, background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe' }}>
+                        {card.cognitiveLevel}
                       </span>
                     )}
                   </div>
@@ -569,36 +638,59 @@ export const ClassNotesPdfView: React.FC<ClassNotesPdfViewProps> = ({
           </section>
         )}
 
-        {/* ===== PAGE BREAK ===== */}
-        {totalFlashcards > 0 && <div className="pdf-page-break" />}
-
-        {/* ===== SECTION 8: Complete Exam Practice Test & MCQ Answer Key ===== */}
+        {/* ===== UNBIASED MCQ PRACTICE TEST ===== */}
         {analysis.quiz && analysis.quiz.length > 0 && (
           <section className="pdf-section-container">
             <div className="pdf-level-badge level-purple">
-              <Award style={{ width: 14, height: 14, display: 'inline', marginRight: 6 }} />
-              SECTION 8: Complete MCQ Exam Practice Test ({totalQuiz} Questions)
+              <HelpCircle style={{ width: 14, height: 14, display: 'inline', marginRight: 6 }} />
+              MCQ Exam Practice Test ({totalQuiz} Questions — Unsolved Test)
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {analysis.quiz.map((item, idx) => (
                 <div key={idx} style={{ padding: 14, borderRadius: 10, background: themeMode === 'light' ? '#f8fafc' : '#1e293b', border: '1px solid #cbd5e1', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: '#0f172a' }}>
-                    Q{idx + 1}: {item.question}
+                  <div style={{ fontSize: 13, fontWeight: 800, color: '#0f172a', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>Q{idx + 1}: {item.question}</span>
+                    {item.difficulty && (
+                      <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 4, background: '#f1f5f9', color: '#475569' }}>
+                        {item.difficulty}
+                      </span>
+                    )}
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-                    {item.options.map((opt, oIdx) => {
-                      const isCorrect = oIdx === item.correctOptionIndex;
-                      return (
-                        <div key={oIdx} style={{ padding: '6px 10px', borderRadius: 6, background: isCorrect ? '#f0fdf4' : '#ffffff', border: isCorrect ? '1.5px solid #22c55e' : '1px solid #e2e8f0', fontSize: 11.5, fontWeight: isCorrect ? 700 : 400, color: isCorrect ? '#15803d' : '#475569' }}>
-                          {String.fromCharCode(65 + oIdx)}. {opt} {isCorrect ? '✓ (Correct)' : ''}
-                        </div>
-                      );
-                    })}
+                    {item.options.map((opt, oIdx) => (
+                      <div key={oIdx} style={{ padding: '8px 12px', borderRadius: 6, background: '#ffffff', border: '1px solid #e2e8f0', fontSize: 12, color: '#334155' }}>
+                        {String.fromCharCode(65 + oIdx)}. {opt}
+                      </div>
+                    ))}
                   </div>
-                  {item.explanation && (
-                    <div style={{ fontSize: 11, color: '#6b21a8', marginTop: 2, background: '#f3e8ff', padding: '4px 8px', borderRadius: 6 }}>
-                      <strong>Rationale:</strong> {item.explanation}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ===== SEPARATE MCQ ANSWER KEY & EXPLANATIONS ===== */}
+        {analysis.mcqAnswerKey && analysis.mcqAnswerKey.length > 0 && (
+          <section className="pdf-section-container">
+            <div className="pdf-level-badge level-purple" style={{ background: '#4c1d95' }}>
+              <Award style={{ width: 14, height: 14, display: 'inline', marginRight: 6 }} />
+              MCQ Answer Key & Detailed Rationale
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {analysis.mcqAnswerKey.map((key, kIdx) => (
+                <div key={kIdx} style={{ padding: 12, borderRadius: 8, background: '#f0fdf4', border: '1.5px solid #22c55e', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <div style={{ fontSize: 12.5, fontWeight: 800, color: '#15803d', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <CheckCircle2 style={{ width: 14, height: 14 }} />
+                    <span>Q{key.questionIndex + 1} Correct Answer: {key.correctOption}</span>
+                  </div>
+                  <div style={{ fontSize: 12, color: '#166534', lineHeight: 1.5 }}>
+                    <strong>Why it's correct:</strong> {key.explanation}
+                  </div>
+                  {key.whyOthersWrong && (
+                    <div style={{ fontSize: 11.5, color: '#991b1b', lineHeight: 1.45, background: '#fef2f2', padding: '4px 8px', borderRadius: 6, marginTop: 2 }}>
+                      <strong>Why others are wrong:</strong> {key.whyOthersWrong}
                     </div>
                   )}
                 </div>

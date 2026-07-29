@@ -33,6 +33,7 @@ export interface Flashcard {
   answer: string;
   topic: string;
   difficulty?: 'Easy' | 'Medium' | 'Hard';
+  cognitiveLevel?: 'Recall' | 'Difference' | 'Why' | 'Application' | 'Error Detection';
   // Spaced Repetition (SM-2 Algorithm) Fields
   easeFactor?: number;      // Default 2.5
   interval?: number;        // Days until next review
@@ -48,6 +49,20 @@ export interface QuizQuestion {
   correctOptionIndex: number;
   explanation: string;
   category?: string;
+  difficulty?: 'Easy' | 'Medium' | 'Hard';
+  whyOthersWrong?: string;
+}
+
+export interface ComparisonTable {
+  title: string;
+  headers: [string, string];
+  rows: [string, string][];
+}
+
+export interface TeacherEmphasis {
+  text: string;
+  tag: '🔥 Most Important' | '⚠ Common Confusion' | '🧠 Mnemonic' | '✍ Exam Answer' | '🎯 PYQ Concept' | '📌 Teacher Repeated';
+  timestamp?: string;
 }
 
 export interface VideoNoteAnalysis {
@@ -70,12 +85,21 @@ export interface VideoNoteAnalysis {
   proTipsGlobal?: string[];
   trapsToAvoidGlobal?: string[];
   
-  // Exhaustive PDF Content Fields
-  detailedNotes?: string;  // Long-form chapter-by-chapter detailed lecture notes
-  formulasAndEquations?: string[];  // Math/science formulas extracted from video
-  vocabularyTerms?: { term: string; definition: string }[];  // Key terms glossary
+  // 3-Level Notes System
+  quickRevisionMap?: string;      // Level 1: Single-page keywords-only rapid revision (max 400 words)
+  smartRevisionNotes?: string;    // Level 2: 3-5 page concise study notes (max 2000 words)
+  detailedNotes?: string;         // Level 3: Full detailed lecture notes (max 4000 words)
   
-  language?: string; // Current language (e.g. 'en', 'hi', 'es')
+  // Structured Content
+  comparisonTables?: ComparisonTable[];
+  teacherEmphasis?: TeacherEmphasis[];
+  formulasAndEquations?: string[];
+  vocabularyTerms?: { term: string; definition: string }[];
+  
+  // MCQ Answer Key (separate from quiz questions for self-test)
+  mcqAnswerKey?: { questionIndex: number; correctOption: string; explanation: string; whyOthersWrong?: string }[];
+  
+  language?: string;
   usageCost?: {
     inputTokens: number;
     outputTokens: number;
