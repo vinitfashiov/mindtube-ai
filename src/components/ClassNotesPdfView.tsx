@@ -27,6 +27,7 @@ import { VideoNoteAnalysis } from '../types/notes';
 interface ClassNotesPdfViewProps {
   analysis: VideoNoteAnalysis;
   onClose: () => void;
+  onSwitchStyle?: (style: 'handbook' | 'tree') => void;
 }
 
 // Custom Markdown Renderer with Source Tags & Inline Formatting
@@ -89,7 +90,8 @@ function formatInlineMarkdown(text: string): string {
 
 export const ClassNotesPdfView: React.FC<ClassNotesPdfViewProps> = ({
   analysis,
-  onClose
+  onClose,
+  onSwitchStyle
 }) => {
   const [themeMode, setThemeMode] = useState<'light' | 'dark'>('light');
   const [isDownloading, setIsDownloading] = useState(false);
@@ -187,6 +189,27 @@ export const ClassNotesPdfView: React.FC<ClassNotesPdfViewProps> = ({
 
         {/* Row 2 / Controls */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', justifyContent: window.innerWidth < 640 ? 'space-between' : 'flex-end', width: window.innerWidth < 640 ? '100%' : 'auto' }}>
+          {/* Switch Style Toggle */}
+          {onSwitchStyle && (
+            <button
+              onClick={() => onSwitchStyle('tree')}
+              style={{
+                padding: '6px 12px',
+                borderRadius: 9999,
+                background: '#f3e8ff',
+                border: '1px solid #ddd6fe',
+                color: '#6d28d9',
+                fontSize: 11.5,
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 5
+              }}
+            >
+              <GitFork style={{ width: 13, height: 13 }} />
+              <span>Switch to Tree PDF</span>
+            </button>
+          )}
           {/* Copy Notes Text */}
           <button
             onClick={handleCopyNotes}

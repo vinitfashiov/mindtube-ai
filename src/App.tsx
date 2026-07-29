@@ -4,6 +4,7 @@ import { ApiKeyModal } from './components/ApiKeyModal';
 import { VideoInputSection } from './components/VideoInputSection';
 import { ChatGptSidebar } from './components/ChatGptSidebar';
 import { ClassNotesPdfView } from './components/ClassNotesPdfView';
+import { TreeNotesPdfView } from './components/TreeNotesPdfView';
 import { ChatWithVideoDrawer } from './components/ChatWithVideoDrawer';
 import { PlaylistInputModal } from './components/PlaylistInputModal';
 import { ApiCostDashboardModal } from './components/ApiCostDashboardModal';
@@ -78,6 +79,15 @@ export const App: React.FC = () => {
   const [isAiResponding, setIsAiResponding] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [currentLanguage, setCurrentLanguage] = useState<string>('en');
+
+  const [pdfStyle, setPdfStyle] = useState<'handbook' | 'tree'>(() => {
+    return (localStorage.getItem('mindtube_pdf_style') as 'handbook' | 'tree') || 'handbook';
+  });
+
+  const handleSelectPdfStyle = (style: 'handbook' | 'tree') => {
+    setPdfStyle(style);
+    localStorage.setItem('mindtube_pdf_style', style);
+  };
 
   // Modals & Drawers
   const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState<boolean>(false);
@@ -493,6 +503,8 @@ export const App: React.FC = () => {
             }}
             currentLanguage={currentLanguage}
             onSelectLanguage={handleSelectLanguage}
+            pdfStyle={pdfStyle}
+            onSelectPdfStyle={handleSelectPdfStyle}
             analysis={analysis}
             activeSessionTitle={activeSession?.title}
             apiKey={apiKey}
@@ -537,10 +549,19 @@ export const App: React.FC = () => {
       />
 
       {isPdfModalOpen && (analysis || SAMPLE_ANALYSIS) && (
-        <ClassNotesPdfView
-          analysis={analysis || SAMPLE_ANALYSIS}
-          onClose={() => setIsPdfModalOpen(false)}
-        />
+        pdfStyle === 'tree' ? (
+          <TreeNotesPdfView
+            analysis={analysis || SAMPLE_ANALYSIS}
+            onClose={() => setIsPdfModalOpen(false)}
+            onSwitchStyle={handleSelectPdfStyle}
+          />
+        ) : (
+          <ClassNotesPdfView
+            analysis={analysis || SAMPLE_ANALYSIS}
+            onClose={() => setIsPdfModalOpen(false)}
+            onSwitchStyle={handleSelectPdfStyle}
+          />
+        )
       )}
 
       {isChatOpen && (analysis || SAMPLE_ANALYSIS) && (

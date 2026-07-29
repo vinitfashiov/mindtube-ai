@@ -35,6 +35,8 @@ interface VideoInputSectionProps {
   onOpenChat: () => void;
   currentLanguage: string;
   onSelectLanguage: (lang: string) => void;
+  pdfStyle?: 'handbook' | 'tree';
+  onSelectPdfStyle?: (style: 'handbook' | 'tree') => void;
   analysis?: VideoNoteAnalysis | null;
   activeSessionTitle?: string;
   apiKey?: string;
@@ -167,7 +169,9 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
   onOpenPdf,
   onOpenChat,
   currentLanguage,
-  onSelectLanguage
+  onSelectLanguage,
+  pdfStyle = 'handbook',
+  onSelectPdfStyle
 }) => {
   const [inputText, setInputText] = useState('');
   const [isListening, setIsListening] = useState(false);
@@ -972,9 +976,25 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
               <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#f4f4f5', border: '1px solid #e4e4e7', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#52525b', cursor: 'pointer' }}>
                 <Plus style={{ width: 14, height: 14 }} />
               </div>
-              <div style={{ padding: '3px 8px', borderRadius: 8, background: '#f4f4f5', border: '1px solid #e4e4e7', fontSize: 11.5, fontWeight: 500, color: '#3f3f46', display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
-                <Bot style={{ width: 13, height: 13, color: '#09090b' }} />
-                <span>MindTube Desktop</span>
+              {/* PDF Style Selector Pill (Replaces MindTube Desktop) */}
+              <div style={{ background: '#f4f4f5', borderRadius: 9999, padding: '4px 10px', display: 'flex', alignItems: 'center', gap: 4, border: '1px solid #e4e4e7' }}>
+                <FileDown style={{ width: 12, height: 12, color: '#7c3aed' }} />
+                <select
+                  value={pdfStyle}
+                  onChange={(e) => onSelectPdfStyle && onSelectPdfStyle(e.target.value as 'handbook' | 'tree')}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    outline: 'none',
+                    fontSize: 11.5,
+                    fontWeight: 600,
+                    color: '#0f172a',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <option value="handbook">📚 Academic Handbook PDF</option>
+                  <option value="tree">🌳 Revisemap Tree PDF</option>
+                </select>
               </div>
             </div>
 
