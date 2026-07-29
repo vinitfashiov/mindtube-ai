@@ -1011,19 +1011,19 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
                 style={{
                   padding: '4px 10px',
                   borderRadius: 9999,
-                  background: customTranscriptText ? '#f0fdf4' : '#f4f4f5',
-                  border: customTranscriptText ? '1px solid #86efac' : '1px solid #e4e4e7',
-                  color: customTranscriptText ? '#15803d' : '#3f3f46',
+                  background: customTranscriptText ? '#f0fdf4' : '#fef3c7',
+                  border: customTranscriptText ? '1px solid #86efac' : '1px solid #fde047',
+                  color: customTranscriptText ? '#15803d' : '#854d0e',
                   fontSize: 11.5,
-                  fontWeight: 600,
+                  fontWeight: 700,
                   display: 'flex',
                   alignItems: 'center',
                   gap: 4,
                   cursor: 'pointer'
                 }}
               >
-                <FileText style={{ width: 12, height: 12, color: customTranscriptText ? '#16a34a' : '#2563eb' }} />
-                <span>{customTranscriptText ? '✅ Transcript Added' : '📝 Paste Transcript'}</span>
+                <FileText style={{ width: 12, height: 12, color: customTranscriptText ? '#16a34a' : '#ca8a04' }} />
+                <span>{customTranscriptText ? '✅ Transcript Attached (100% Grounded)' : '⚠️ 📝 Paste Video Transcript'}</span>
               </button>
             </div>
 
