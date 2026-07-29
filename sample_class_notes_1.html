@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>YouTube Video To PDF - Claude Code Front-End Design Levels</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0f172a;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 40px 20px;
+      color: #0f172a;
+    }
+    .print-btn-bar {
+      max-width: 960px;
+      margin: 0 auto 20px auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1e293b;
+      padding: 12px 20px;
+      border-radius: 12px;
+      color: #fff;
+    }
+    .btn {
+      background: #0d9488;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .pdf-page {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 36px 40px;
+      border: 4px double #0d9488;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      position: relative;
+    }
+    .header {
+      text-align: center;
+      border-bottom: 3px double #0f172a;
+      padding-bottom: 12px;
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      font-size: 38px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      text-transform: uppercase;
+    }
+    .header .domain {
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .columns {
+      column-count: 3;
+      column-gap: 20px;
+    }
+    .block {
+      break-inside: avoid;
+      margin-bottom: 16px;
+    }
+    .badge-level {
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      background: #4c1d95;
+      border: 2px solid #fbbf24;
+    }
+    .badge-level-indigo {
+      background: #312e81;
+      border: 2px solid #38bdf8;
+    }
+    .badge-sub {
+      font-weight: 800;
+      font-size: 11px;
+      margin-bottom: 4px;
+      display: inline-block;
+      color: #047857;
+      border-bottom: 2px solid #047857;
+    }
+    .node {
+      font-size: 10.5px;
+      line-height: 1.4;
+      margin-bottom: 3px;
+      display: flex;
+      align-items: flex-start;
+      gap: 4px;
+    }
+    .branch {
+      font-family: monospace;
+      color: #0284c7;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+    .prompt-box {
+      background: #fff1f2;
+      border: 1.5px solid #be123c;
+      padding: 6px 8px;
+      border-radius: 4px;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #9f1239;
+      margin-bottom: 4px;
+    }
+    .footer {
+      border-top: 1px solid #cbd5e1;
+      margin-top: 24px;
+      padding-top: 8px;
+      text-align: center;
+      font-size: 10px;
+      color: #64748b;
+      font-family: monospace;
+    }
+    @media print {
+      body { background: #fff; padding: 0; }
+      .print-btn-bar { display: none; }
+      .pdf-page { box-shadow: none; border: 3px double #0d9488; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="print-btn-bar">
+    <div><strong>ReviseMap PDF Preview</strong> - Sample 1 (Claude Code Design Levels)</div>
+    <button class="btn" onclick="window.print()">📄 Save as PDF / Print</button>
+  </div>
+
+  <div class="pdf-page">
+    <div class="header">
+      <h1>YouTube Video To PDF</h1>
+      <div class="domain">revisemap.com</div>
+    </div>
+
+    <div class="columns">
+      <!-- Level 1 -->
+      <div class="block">
+        <div class="badge-level">Level 1: Just You and a Prompt</div>
+        <div class="badge-sub">Description</div>
+        <div class="node"><span class="branch">|_</span><span>Opening Claude Code with a generic prompt for Argus landing page.</span></div>
+        
+        <div class="prompt-box">Example Prompt: "Hey, let's create a landing page for Argus..."</div>
+
+        <div class="badge-sub" style="color: #b45309; border-color: #b45309;">Outcome</div>
+        <div class="node"><span class="branch">|_</span><span>Very generic output, no design direction given.</span></div>
+        <div class="node"><span class="branch">|_</span><span>AI has no taste; inability to articulate design preferences.</span></div>
+        <div class="node"><span class="branch">|_</span><span>Output includes generic styles like purple gradients.</span></div>
+      </div>
+
+      <!-- Skills to Master -->
+      <div class="block">
+        <div class="badge-sub">Skills to Master</div>
+        <div class="node"><span class="branch">|_</span><span>Writing descriptive prompts.</span></div>
+        <div class="node"><span class="branch">|_</span><span>Specifying frameworks and understanding them.</span></div>
+        <div class="node"><span class="branch">|_</span><span>Building a basic design vocabulary.</span></div>
+      </div>
+
+      <!-- Level 2 -->
+      <div class="block">
+        <div class="badge-level badge-level-indigo">Level 2: Give Claude a Design Education</div>
+        <div class="badge-sub">Description</div>
+        <div class="node"><span class="branch">|_</span><span>Using specialized prompts to guide Claude's design process.</span></div>
+        <div class="node"><span class="branch">|_</span><span>Leveraging external skills like 'front-end design skill' and 'UI/UX Pro Max skill'.</span></div>
+      </div>
+
+      <!-- Level 3 -->
+      <div class="block">
+        <div class="badge-level">Level 3: Become the Visual Director</div>
+        <div class="badge-sub">Description</div>
+        <div class="node"><span class="branch">|_</span><span>Moving beyond text prompts to visual medium: showing, not just telling.</span></div>
+        <div class="node"><span class="branch">|_</span><span>Using concrete visual examples of desired outcomes.</span></div>
+        
+        <div class="badge-sub" style="color: #b45309; border-color: #b45309;">Sources for Inspiration</div>
+        <div class="node"><span class="branch">|_</span><span>Awwwards</span></div>
+        <div class="node"><span class="branch">|_</span><span>godly.website</span></div>
+        <div class="node"><span class="branch">|_</span><span>Pinterest & Dribbble for SaaS landing pages.</span></div>
+      </div>
+
+      <!-- Level 4 -->
+      <div class="block">
+        <div class="badge-level badge-level-indigo">Level 4: The Cloner</div>
+        <div class="badge-sub">Description</div>
+        <div class="node"><span class="branch">|_</span><span>Going beyond surface inspiration to properly cloning underlying code.</span></div>
+        <div class="node"><span class="branch">|_</span><span>Deconstructing websites and using them as templates to build upon.</span></div>
+      </div>
+
+      <!-- Level 5 -->
+      <div class="block">
+        <div class="badge-level">Level 5: Customization & Personalization</div>
+        <div class="badge-sub">Utilizing Custom Assets</div>
+        <div class="node"><span class="branch">|_</span><span>Finding quality components from 21st.dev and CodePen.</span></div>
+        <div class="node"><span class="branch">|_</span><span>Creating original designs using Midjourney for art-forward imagery.</span></div>
+      </div>
+    </div>
+
+    <div class="footer">
+      This is a class notes pdf. It may contains class info. [Not for sale] • revisemap.com / mindtube.ai
+    </div>
+  </div>
+
+</body>
+</html>
