@@ -451,7 +451,7 @@ export const App: React.FC = () => {
         />
 
         {/* Main Content Workspace Container */}
-        <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%', position: 'relative' }}>
+        <main style={{ flex: 1, height: '100%', minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%', position: 'relative' }}>
           {/* Error Alert */}
           {errorMsg && (
             <div style={{

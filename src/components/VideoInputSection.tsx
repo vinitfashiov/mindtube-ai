@@ -288,7 +288,7 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
   };
 
   return (
-    <div style={{ width: '100%', height: '100%', minHeight: 0, display: 'grid', gridTemplateRows: '1fr auto', overflow: 'hidden' }}>
+    <div style={{ flex: 1, width: '100%', height: '100%', minHeight: 0, maxHeight: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', overflow: 'hidden' }}>
       {/* If Active Chat Session Messages is Empty: Show Fresh Hero + 4 Action Cards */}
       {messages.length === 0 && !isLoading ? (
         <div className="no-scrollbar hero-scroll-container" style={{ flex: 1, height: '100%', minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 14, paddingTop: '12px', paddingBottom: 12, paddingLeft: 12, paddingRight: 12, margin: '0 auto', width: '100%', maxWidth: 680 }}>
@@ -381,7 +381,7 @@ export const VideoInputSection: React.FC<VideoInputSectionProps> = ({
         </div>
       ) : (
         /* Active Chat Session Stream */
-        <div className="no-scrollbar" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 740, margin: '0 auto', width: '100%', padding: '20px 16px 20px 16px' }}>
+        <div className="no-scrollbar" style={{ flex: 1, height: '100%', minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 740, margin: '0 auto', width: '100%', padding: '20px 16px 20px 16px' }}>
           {activeSessionTitle && (
             <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.6, borderBottom: '1px solid #f1f5f9', paddingBottom: 6, marginBottom: 4 }}>
               Session: {activeSessionTitle}
