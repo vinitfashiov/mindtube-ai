@@ -17,11 +17,19 @@ export const App: React.FC = () => {
 
   // Responsive desktop detection
   const [isDesktop, setIsDesktop] = useState<boolean>(() => window.innerWidth >= 768);
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false); // ALWAYS CLOSED BY DEFAULT ON INITIAL LOAD!
 
   useEffect(() => {
     const handleResize = () => {
-      setIsDesktop(window.innerWidth >= 768);
+      const desktop = window.innerWidth >= 768;
+      setIsDesktop(desktop);
+      if (!desktop) {
+        setIsSidebarOpen(false); // Force closed on mobile
+      } else {
+        setIsSidebarOpen(true); // Open on desktop
+      }
     };
+    handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -65,9 +73,8 @@ export const App: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [currentLanguage, setCurrentLanguage] = useState<string>('en');
 
-  // Modals & Drawers (Default sidebar open on Desktop, CLOSED on Mobile!)
+  // Modals & Drawers
   const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState<boolean>(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(() => window.innerWidth >= 768);
   const [isPdfModalOpen, setIsPdfModalOpen] = useState<boolean>(false);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
   const [isPlaylistModalOpen, setIsPlaylistModalOpen] = useState<boolean>(false);
