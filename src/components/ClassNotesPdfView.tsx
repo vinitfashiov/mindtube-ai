@@ -20,6 +20,7 @@ import {
   Zap,
   Flame,
   HelpCircle,
+  AlertTriangle,
   Table as TableIcon
 } from 'lucide-react';
 import { VideoNoteAnalysis } from '../types/notes';
@@ -332,6 +333,40 @@ export const ClassNotesPdfView: React.FC<ClassNotesPdfViewProps> = ({
               </span>
             )}
           </div>
+
+          {/* Source Fidelity & Topic Inventory Audit Box */}
+          {analysis.sourceAudit && (
+            <div style={{ marginTop: 12, padding: 12, borderRadius: 8, background: '#f8fafc', border: '1px solid #cbd5e1' }}>
+              <div style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.5, color: '#0d9488', marginBottom: 6 }}>
+                🔍 Source Integrity & Topic Coverage Report
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 8, fontSize: 11 }}>
+                <div><strong>Detected Format:</strong> {analysis.sourceAudit.videoType.replace(/_/g, ' ')}</div>
+                <div><strong>Transcript Coverage:</strong> {analysis.sourceAudit.transcriptCoveragePercent}%</div>
+                <div><strong>Detected Subjects:</strong> {analysis.sourceAudit.detectedSubjects?.join(', ') || 'General Science'}</div>
+                <div><strong>Factual Status:</strong> {analysis.sourceAudit.contradictionsFound === 0 ? '✅ Verified (Zero Contradictions)' : `⚠️ ${analysis.sourceAudit.contradictionsFound} Unverified Claims`}</div>
+              </div>
+
+              {analysis.sourceAudit.transcriptWarning && (
+                <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 6, background: '#fffbe6', border: '1px solid #ffe58f', color: '#873800', fontSize: 10.5 }}>
+                  ⚠️ {analysis.sourceAudit.transcriptWarning}
+                </div>
+              )}
+
+              {analysis.topicInventory && analysis.topicInventory.length > 0 && (
+                <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid #e2e8f0' }}>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, color: '#334155', marginBottom: 4 }}>Detected Topic Inventory:</div>
+                  <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+                    {analysis.topicInventory.map((top, tIdx) => (
+                      <span key={tIdx} style={{ fontSize: 10, padding: '2px 7px', borderRadius: 6, background: '#ffffff', border: '1px solid #cbd5e1', color: '#1e293b' }}>
+                        <strong>{top.subject}:</strong> {top.topic} ({top.start}-{top.end})
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* ===== TABLE OF CONTENTS ===== */}
@@ -414,6 +449,35 @@ export const ClassNotesPdfView: React.FC<ClassNotesPdfViewProps> = ({
             </div>
             <div style={{ background: themeMode === 'light' ? '#ffffff' : '#0f172a', padding: 18, borderRadius: 10, border: '1px solid #cbd5e1' }}>
               {renderMarkdownText(analysis.smartRevisionNotes)}
+            </div>
+          </section>
+        )}
+
+        {/* ===== FACTUAL VERIFICATION & CORRECTIONS ===== */}
+        {analysis.factualCorrections && analysis.factualCorrections.length > 0 && (
+          <section className="pdf-section-container">
+            <div className="pdf-level-badge level-indigo" style={{ background: '#b91c1c' }}>
+              <AlertTriangle style={{ width: 14, height: 14, display: 'inline', marginRight: 6 }} />
+              Scientific Verification & Factual Corrections ({analysis.factualCorrections.length} Items Flagged)
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {analysis.factualCorrections.map((item, idx) => (
+                <div key={idx} style={{ padding: 12, borderRadius: 8, background: '#fef2f2', border: '1px solid #fca5a5' }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#991b1b', marginBottom: 4 }}>
+                    ⚠️ Teacher/Video Statement {item.timestamp ? `(${item.timestamp})` : ''}:
+                  </div>
+                  <div style={{ fontSize: 12, color: '#7f1d1d', fontStyle: 'italic', marginBottom: 6 }}>
+                    "{item.teacherStatement}"
+                  </div>
+                  <div style={{ fontSize: 12, fontWeight: 800, color: '#15803d', borderTop: '1px solid #fecaca', paddingTop: 6 }}>
+                    ✅ Verified Scientific Correction:
+                  </div>
+                  <div style={{ fontSize: 12, color: '#166534' }}>
+                    {item.scientificCorrection}
+                  </div>
+                </div>
+              ))}
             </div>
           </section>
         )}

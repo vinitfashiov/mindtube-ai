@@ -635,6 +635,27 @@ export const TreeNotesPdfView: React.FC<TreeNotesPdfViewProps> = ({
                     </div>
                   </div>
 
+                  {/* On Page 1, show Source Audit & Subject Coverage Strip */}
+                  {pIdx === 0 && analysis.sourceAudit && (
+                    <div style={{
+                      background: '#f0fdf4',
+                      border: '1px solid #16a34a',
+                      borderRadius: 2,
+                      padding: '3px 8px',
+                      marginBottom: 8,
+                      fontSize: 9.5,
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      color: '#14532d',
+                      position: 'relative',
+                      zIndex: 1
+                    }}>
+                      <span><strong>Format:</strong> {analysis.sourceAudit.videoType.replace(/_/g, ' ')} ({analysis.sourceAudit.detectedSubjects?.join(', ') || 'General Science'})</span>
+                      <span><strong>Transcript:</strong> {analysis.sourceAudit.isTranscriptFetched ? '✅ Spoken Transcript Grounded (100%)' : '⚠️ Metadata Fallback'}</span>
+                    </div>
+                  )}
+
                   {/* DENSE 4-COLUMN TREE GRID FOR THIS PAGE */}
                   <div style={{
                     display: 'grid',

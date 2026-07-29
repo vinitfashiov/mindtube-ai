@@ -73,6 +73,32 @@ export interface RevisemapTreeNode {
   children?: RevisemapTreeNode[];
 }
 
+export interface TopicInventoryItem {
+  topic: string;
+  subject: string; // e.g. 'Physics', 'Chemistry', 'Biology', 'General Science'
+  start: string;   // e.g. '00:00'
+  end: string;     // e.g. '03:20'
+  importance: 'high' | 'medium' | 'low';
+  proportionPercent?: number;
+}
+
+export interface FactualCorrection {
+  teacherStatement: string;
+  scientificCorrection: string;
+  timestamp?: string;
+  topic?: string;
+}
+
+export interface SourceAuditMetadata {
+  videoType: 'multi_topic_revision_class' | 'expected_questions_session' | 'single_topic_lecture' | 'question_answer_session' | 'problem_solving_video';
+  detectedSubjects: string[];
+  transcriptCoveragePercent: number;
+  transcriptWarning?: string;
+  isTranscriptFetched: boolean;
+  contradictionsFound: number;
+  unverifiedClaims: number;
+}
+
 export interface VideoNoteAnalysis {
   id: string;
   videoId: string;
@@ -98,7 +124,10 @@ export interface VideoNoteAnalysis {
   smartRevisionNotes?: string;    // Level 2: 3-5 page concise study notes (max 2000 words)
   detailedNotes?: string;         // Level 3: Full detailed lecture notes (max 4000 words)
   
-  // Structured Content
+  // Structured Content & Source Fidelity Engine
+  topicInventory?: TopicInventoryItem[];
+  factualCorrections?: FactualCorrection[];
+  sourceAudit?: SourceAuditMetadata;
   comparisonTables?: ComparisonTable[];
   teacherEmphasis?: TeacherEmphasis[];
   revisemapTree?: RevisemapTreeNode[]; // EXHAUSTIVE Revisemap-style tree of the whole video
