@@ -653,6 +653,10 @@ ${transcriptResult.success ? `- FULL SPOKEN VIDEO TRANSCRIPT ATTACHED (${transcr
 ${transcriptResult.success ? `=== COMPLETE UNTRUNCATED SPOKEN VIDEO TRANSCRIPT (SOURCE GROUND TRUTH) ===\n${transcriptText}\n=== END COMPLETE SPOKEN TRANSCRIPT ===` : ''}
 
 ABSOLUTE CRITICAL PIPELINE & SOURCE FIDELITY RULES:
+0. STRICT ZERO-UNSUPPORTED ASSUMPTIONS (100% GROUNDED TRANSCRIPT FIDELITY):
+   - DO NOT invent generic textbook definitions, general broad overviews, or assumptions that were NOT spoken in the video transcript!
+   - Include ALL exact names, specific prices, model numbers, features, statistics, formulas, data points, and teacher statements spoken in the transcript!
+   - If a video talks about specific automobile model specs, exact prices, or specific exam questions, EVERY SINGLE ONE of those specific facts MUST be present verbatim in the detailed notes and Revisemap tree!
 1. SOURCE-GROUNDING & TOPIC INVENTORY FIRST (Zero Topic Misclassification):
    - Analyze the transcript/video to build a complete topic inventory.
    - Detect video type: 'multi_topic_revision_class', 'expected_questions_session', 'single_topic_lecture', 'question_answer_session', or 'problem_solving_video'.
@@ -866,7 +870,10 @@ You MUST strictly return ONLY raw valid JSON matching this schema:
           transcriptWarning: transcriptResult.warning,
           isTranscriptFetched: transcriptResult.success,
           contradictionsFound: parsedData.sourceAudit?.contradictionsFound || 0,
-          unverifiedClaims: parsedData.sourceAudit?.unverifiedClaims || 0
+          unverifiedClaims: parsedData.sourceAudit?.unverifiedClaims || 0,
+          totalTranscriptWords: transcriptText ? transcriptText.split(/\s+/).length : 0,
+          methodUsed: transcriptResult.methodUsed || (transcriptResult.success ? 'RapidAPI YouTube Transcriptor' : 'Metadata Only'),
+          rawTranscriptSnippet: transcriptText ? transcriptText.substring(0, 3000) : ''
         },
         comparisonTables: parsedData.comparisonTables || [],
         teacherEmphasis: parsedData.teacherEmphasis || [],

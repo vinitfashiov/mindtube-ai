@@ -97,6 +97,9 @@ export interface SourceAuditMetadata {
   isTranscriptFetched: boolean;
   contradictionsFound: number;
   unverifiedClaims: number;
+  totalTranscriptWords?: number;
+  methodUsed?: string;
+  rawTranscriptSnippet?: string;
 }
 
 export interface VideoNoteAnalysis {
