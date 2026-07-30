@@ -53,6 +53,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'models' | 'api_key' | 'preferences' | 'data'>('models');
   const [keyInput, setKeyInput] = useState(apiKey);
+  const [rapidKeyInput, setRapidKeyInput] = useState(typeof localStorage !== 'undefined' ? localStorage.getItem('mindtube_rapidapi_key') || '' : '');
   const [showKey, setShowKey] = useState(false);
   const [savedNotice, setSavedNotice] = useState(false);
 
@@ -319,7 +320,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: apiKey ? '#16a34a' : '#64748b', fontWeight: 600 }}>
                       <ShieldCheck style={{ width: 16, height: 16 }} />
-                      <span>{apiKey ? 'API Key Active ✓' : 'Currently in DEMO mode'}</span>
+                      <span>{apiKey ? 'Gemini API Key Active ✓' : 'Currently in DEMO mode'}</span>
                     </div>
 
                     <button
@@ -335,23 +336,79 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         cursor: 'pointer'
                       }}
                     >
-                      Save Key
+                      Save Gemini Key
                     </button>
                   </div>
 
                   {savedNotice && (
                     <div style={{ padding: '8px 12px', borderRadius: 8, background: '#f0fdf4', border: '1px solid #bbf7d0', color: '#166534', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
                       <CheckCircle2 style={{ width: 15, height: 15 }} />
-                      <span>API Key updated successfully!</span>
+                      <span>Gemini API Key updated successfully!</span>
                     </div>
                   )}
                 </form>
 
-                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: 14, borderRadius: 12, fontSize: 12, color: '#475569', lineHeight: 1.5 }}>
-                  <strong>Don't have a Gemini API key?</strong> Get a free key in 30 seconds from Google AI Studio at{' '}
-                  <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" style={{ color: '#2563eb', fontWeight: 700, textDecoration: 'underline' }}>
-                    aistudio.google.com
-                  </a>.
+                {/* ===== RAPIDAPI YOUTUBE TRANSCRIPT KEY SECTION ===== */}
+                <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: 16, marginTop: 10, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <div>
+                    <h4 style={{ fontSize: 14, fontWeight: 800, color: '#0f172a', margin: '0 0 2px 0', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <Sparkles style={{ width: 16, height: 16, color: '#7c3aed' }} />
+                      RapidAPI YouTube Transcript Key (Automatic 100% Spoken Subtitles)
+                    </h4>
+                    <p style={{ fontSize: 12, color: '#64748b', margin: 0 }}>
+                      Connect your free RapidAPI key to automatically fetch 100% spoken transcripts for any YouTube video with zero CORS errors!
+                    </p>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <input
+                      type="password"
+                      value={rapidKeyInput}
+                      onChange={(e) => setRapidKeyInput(e.target.value)}
+                      placeholder="Paste RapidAPI Key (e.g. 8923ab1234msh...)"
+                      style={{
+                        flex: 1,
+                        padding: '10px 14px',
+                        borderRadius: 10,
+                        border: '1.5px solid #cbd5e1',
+                        fontSize: 13,
+                        fontFamily: 'Consolas, monospace',
+                        outline: 'none'
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        localStorage.setItem('mindtube_rapidapi_key', rapidKeyInput.trim());
+                        alert('RapidAPI YouTube Transcript Key Saved!');
+                      }}
+                      style={{
+                        padding: '10px 18px',
+                        borderRadius: 10,
+                        background: 'linear-gradient(135deg, #7c3aed, #4f46e5)',
+                        color: '#ffffff',
+                        fontSize: 12.5,
+                        fontWeight: 700,
+                        border: 'none',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Save RapidAPI Key
+                    </button>
+                  </div>
+
+                  {/* STEP BY STEP INSTRUCTIONS BOX */}
+                  <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: 14, borderRadius: 12, fontSize: 12, color: '#334155', lineHeight: 1.5 }}>
+                    <div style={{ fontWeight: 800, color: '#0f172a', marginBottom: 6 }}>
+                      🔑 4 Easy Steps to Get Your Free RapidAPI Key:
+                    </div>
+                    <ol style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      <li>Go to <strong><a href="https://rapidapi.com/auth/sign-up" target="_blank" rel="noopener noreferrer" style={{ color: '#2563eb', fontWeight: 700 }}>rapidapi.com</a></strong> and create a free account.</li>
+                      <li>Search for <strong>"YouTube Transcriptor"</strong> or open <strong><a href="https://rapidapi.com/kstandard/api/youtube-transcriptor" target="_blank" rel="noopener noreferrer" style={{ color: '#2563eb', fontWeight: 700 }}>youtube-transcriptor API</a></strong>.</li>
+                      <li>Click the blue <strong>"Subscribe to Test"</strong> button (Select the Free $0 plan - 500 requests/month free).</li>
+                      <li>Copy your <strong>`X-RapidAPI-Key`</strong> from the header code snippet on the right side and paste it above!</li>
+                    </ol>
+                  </div>
                 </div>
               </div>
             )}
