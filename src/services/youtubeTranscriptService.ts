@@ -21,8 +21,8 @@ export interface VideoTranscriptResult {
 // User-provided System RapidAPI Key (Hardcoded into backend system)
 export const SYSTEM_RAPIDAPI_KEY = "410bbf96b4msh8cd91df5fc3db0cp1c1b6ajsn0fd7d874c865";
 
-// Fetch with hard 10-second timeout for RapidAPI
-async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs = 10000): Promise<Response> {
+// Fetch with hard 8-second timeout for RapidAPI
+async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs = 8000): Promise<Response> {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -80,7 +80,59 @@ export function parseCaptionXml(xmlText: string): TranscriptSegment[] {
   return segments;
 }
 
-// Direct RapidAPI Fetch Helper using System Key
+// Universal RapidAPI JSON Response Parser
+function parseRapidApiResponse(data: any, videoId: string, methodLabel: string): VideoTranscriptResult | null {
+  const firstElem = Array.isArray(data) ? data[0] : data;
+  if (!firstElem) return null;
+
+  const rawArray = firstElem.transcription || firstElem.transcript || firstElem.transcripts || (Array.isArray(firstElem) ? firstElem : null);
+
+  let segments: TranscriptSegment[] = [];
+
+  if (Array.isArray(rawArray) && rawArray.length > 0) {
+    segments = rawArray.map((item: any) => {
+      const start = typeof item.start === 'number' ? item.start : parseFloat(item.start || '0');
+      const duration = typeof item.dur === 'number' ? item.dur : (typeof item.duration === 'number' ? item.duration : 3);
+      const text = (item.subtitle || item.text || item.content || '').replace(/<[^>]+>/g, '').trim();
+      return {
+        start,
+        duration,
+        text,
+        timestamp: formatSecondsToTimestamp(start)
+      };
+    }).filter((s) => s.text.length > 0);
+  }
+
+  let fullTranscriptText = '';
+  if (segments.length > 0) {
+    fullTranscriptText = segments.map((s) => `[${s.timestamp}] ${s.text}`).join('\n');
+  } else if (firstElem.transcriptionAsText && typeof firstElem.transcriptionAsText === 'string') {
+    fullTranscriptText = firstElem.transcriptionAsText.trim();
+    segments = [{
+      start: 0,
+      duration: 60,
+      text: fullTranscriptText,
+      timestamp: '00:00'
+    }];
+  }
+
+  if (fullTranscriptText.length > 30) {
+    const lastSeg = segments[segments.length - 1];
+    return {
+      videoId,
+      success: true,
+      language: 'auto',
+      segments,
+      fullTranscriptText,
+      totalDurationSeconds: lastSeg ? Math.ceil(lastSeg.start + lastSeg.duration) : (firstElem.lengthInSeconds || 0),
+      totalCharacterCount: fullTranscriptText.length,
+      methodUsed: methodLabel
+    };
+  }
+  return null;
+}
+
+// Multi-Proxy RapidAPI Fetch Helper using System Key
 export async function fetchRapidApiTranscript(videoId: string, customRapidApiKey?: string): Promise<VideoTranscriptResult | null> {
   if (!videoId) return null;
   const key = (customRapidApiKey && customRapidApiKey.trim().length > 5) 
@@ -89,116 +141,59 @@ export async function fetchRapidApiTranscript(videoId: string, customRapidApiKey
       ? localStorage.getItem('mindtube_rapidapi_key')!.trim() 
       : SYSTEM_RAPIDAPI_KEY;
 
-  // RapidAPI Host 1: youtube-transcriptor.p.rapidapi.com
+  const targetUrl = `https://youtube-transcriptor.p.rapidapi.com/transcript?video_id=${encodeURIComponent(videoId)}`;
+
+  // 1. Direct Fetch
   try {
-    const url = `https://youtube-transcriptor.p.rapidapi.com/transcript?video_id=${encodeURIComponent(videoId)}`;
-    const res = await fetchWithTimeout(url, {
+    const res = await fetchWithTimeout(targetUrl, {
       headers: {
         'x-rapidapi-key': key,
         'x-rapidapi-host': 'youtube-transcriptor.p.rapidapi.com'
       }
-    }, 10000);
-
+    }, 8000);
     if (res.ok) {
       const data = await res.json();
-      const firstElem = Array.isArray(data) ? data[0] : data;
-
-      if (firstElem) {
-        const rawArray = firstElem.transcription || firstElem.transcript || firstElem.transcripts || (Array.isArray(firstElem) ? firstElem : null);
-
-        let segments: TranscriptSegment[] = [];
-
-        if (Array.isArray(rawArray) && rawArray.length > 0) {
-          segments = rawArray.map((item: any) => {
-            const start = typeof item.start === 'number' ? item.start : parseFloat(item.start || '0');
-            const duration = typeof item.dur === 'number' ? item.dur : (typeof item.duration === 'number' ? item.duration : 3);
-            const text = (item.subtitle || item.text || item.content || '').replace(/<[^>]+>/g, '').trim();
-            return {
-              start,
-              duration,
-              text,
-              timestamp: formatSecondsToTimestamp(start)
-            };
-          }).filter((s) => s.text.length > 0);
-        }
-
-        let fullTranscriptText = '';
-        if (segments.length > 0) {
-          fullTranscriptText = segments.map((s) => `[${s.timestamp}] ${s.text}`).join('\n');
-        } else if (firstElem.transcriptionAsText && typeof firstElem.transcriptionAsText === 'string') {
-          fullTranscriptText = firstElem.transcriptionAsText.trim();
-          segments = [{
-            start: 0,
-            duration: 60,
-            text: fullTranscriptText,
-            timestamp: '00:00'
-          }];
-        }
-
-        if (fullTranscriptText.length > 30) {
-          const lastSeg = segments[segments.length - 1];
-          return {
-            videoId,
-            success: true,
-            language: 'auto',
-            segments,
-            fullTranscriptText,
-            totalDurationSeconds: lastSeg ? Math.ceil(lastSeg.start + lastSeg.duration) : (firstElem.lengthInSeconds || 0),
-            totalCharacterCount: fullTranscriptText.length,
-            methodUsed: 'System RapidAPI Engine (100% Grounded)'
-          };
-        }
-      }
+      const parsed = parseRapidApiResponse(data, videoId, 'System RapidAPI Engine Direct (100% Grounded)');
+      if (parsed) return parsed;
     }
   } catch (err) {
-    console.warn("RapidAPI Host 1 notice:", err);
+    console.warn("RapidAPI direct fetch notice:", err);
   }
 
-  // RapidAPI Host 2: youtube-transcript3.p.rapidapi.com
+  // 2. CORS Proxy 1 (corsproxy.io)
   try {
-    const url = `https://youtube-transcript3.p.rapidapi.com/api/transcript-with-url?url=${encodeURIComponent(`https://www.youtube.com/watch?v=${videoId}`)}`;
-    const res = await fetchWithTimeout(url, {
+    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
+    const res = await fetchWithTimeout(proxyUrl, {
       headers: {
         'x-rapidapi-key': key,
-        'x-rapidapi-host': 'youtube-transcript3.p.rapidapi.com'
+        'x-rapidapi-host': 'youtube-transcriptor.p.rapidapi.com'
       }
     }, 8000);
-
     if (res.ok) {
       const data = await res.json();
-      const rawArray = Array.isArray(data) ? data : (data.transcript || data.transcripts);
-
-      if (Array.isArray(rawArray) && rawArray.length > 0) {
-        const segments: TranscriptSegment[] = rawArray.map((item: any) => {
-          const start = typeof item.start === 'number' ? item.start : parseFloat(item.start || '0');
-          const duration = typeof item.duration === 'number' ? item.duration : parseFloat(item.duration || '3');
-          const text = (item.subtitle || item.text || item.content || '').replace(/<[^>]+>/g, '').trim();
-          return {
-            start,
-            duration,
-            text,
-            timestamp: formatSecondsToTimestamp(start)
-          };
-        }).filter((s) => s.text.length > 0);
-
-        if (segments.length > 0) {
-          const fullTranscriptText = segments.map((s) => `[${s.timestamp}] ${s.text}`).join('\n');
-          const lastSeg = segments[segments.length - 1];
-          return {
-            videoId,
-            success: true,
-            language: 'auto',
-            segments,
-            fullTranscriptText,
-            totalDurationSeconds: Math.ceil(lastSeg.start + lastSeg.duration),
-            totalCharacterCount: fullTranscriptText.length,
-            methodUsed: 'RapidAPI YouTube Transcript3'
-          };
-        }
-      }
+      const parsed = parseRapidApiResponse(data, videoId, 'System RapidAPI Engine CorsProxy (100% Grounded)');
+      if (parsed) return parsed;
     }
   } catch (err) {
-    console.warn("RapidAPI Host 2 notice:", err);
+    console.warn("RapidAPI corsproxy notice:", err);
+  }
+
+  // 3. CORS Proxy 2 (allorigins.win)
+  try {
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+    const res = await fetchWithTimeout(proxyUrl, {
+      headers: {
+        'x-rapidapi-key': key,
+        'x-rapidapi-host': 'youtube-transcriptor.p.rapidapi.com'
+      }
+    }, 8000);
+    if (res.ok) {
+      const data = await res.json();
+      const parsed = parseRapidApiResponse(data, videoId, 'System RapidAPI Engine AllOrigins (100% Grounded)');
+      if (parsed) return parsed;
+    }
+  } catch (err) {
+    console.warn("RapidAPI allorigins notice:", err);
   }
 
   return null;
@@ -214,7 +209,6 @@ export function parseRawTranscriptText(rawText: string): VideoTranscriptResult {
     const trimmed = line.trim();
     if (!trimmed) return;
 
-    // Check if line starts with timestamp like [02:14] or 02:14
     const timeMatch = trimmed.match(/^\[?(\d{1,2}:)?(\d{1,2}):(\d{2})\]?\s*(.*)$/);
     if (timeMatch) {
       const hours = timeMatch[1] ? parseInt(timeMatch[1].replace(':', '')) : 0;
@@ -272,7 +266,7 @@ export async function fetchYouTubeTranscript(videoId: string, customRapidApiKey?
     };
   }
 
-  // METHOD -1: Primary System RapidAPI Key Fetch (Zero Frontend Config Required!)
+  // METHOD -1: Primary Multi-Proxy System RapidAPI Key Fetch
   try {
     const rapidResult = await fetchRapidApiTranscript(videoId, customRapidApiKey);
     if (rapidResult && rapidResult.success && rapidResult.fullTranscriptText.length > 50) {
@@ -282,7 +276,7 @@ export async function fetchYouTubeTranscript(videoId: string, customRapidApiKey?
     console.warn('RapidAPI direct system fetch notice:', err);
   }
 
-  // METHOD 0: Direct Vercel Serverless Backend API Route (Zero CORS, 8s Timeout)
+  // METHOD 0: Direct Vercel Serverless Backend API Route
   try {
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     const apiUrl = `${origin}/api/transcript?v=${encodeURIComponent(videoId)}`;
@@ -314,7 +308,7 @@ export async function fetchYouTubeTranscript(videoId: string, customRapidApiKey?
     fullTranscriptText: '',
     totalDurationSeconds: 0,
     totalCharacterCount: 0,
-    warning: 'Transcript could not be retrieved automatically. Please paste transcript text in the "Paste Video Transcript" drawer for 100% video fidelity.',
+    warning: 'Transcript could not be retrieved automatically. Please click "⚠️ 📝 Paste Video Transcript" in the chat bar to attach the transcript lines for 100% video fidelity.',
     methodUsed: 'Fallback'
   };
 }
