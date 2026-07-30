@@ -114,7 +114,7 @@ export function parseRawTranscriptText(rawText: string): VideoTranscriptResult {
   };
 }
 
-// Fetch Real YouTube Subtitles / Captions via Multi-Proxy Pipeline
+// Fetch Real YouTube Subtitles / Captions via Multi-Method Pipeline
 export async function fetchYouTubeTranscript(videoId: string): Promise<VideoTranscriptResult> {
   if (!videoId) {
     return {
@@ -128,7 +128,30 @@ export async function fetchYouTubeTranscript(videoId: string): Promise<VideoTran
     };
   }
 
-  // METHOD 1: Primary CORS Proxy via ytInitialPlayerResponse
+  // METHOD 0: Direct Vercel Serverless Backend API Route (Zero CORS, 1-Click Automatic!)
+  try {
+    const apiUrl = `/api/transcript?v=${encodeURIComponent(videoId)}`;
+    const res = await fetch(apiUrl);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.success && data.fullTranscriptText) {
+        return {
+          videoId,
+          success: true,
+          language: data.language || 'auto',
+          segments: data.segments || [],
+          fullTranscriptText: data.fullTranscriptText,
+          totalDurationSeconds: data.totalDurationSeconds || 0,
+          totalCharacterCount: data.totalCharacterCount || data.fullTranscriptText.length,
+          methodUsed: 'Automatic Vercel Serverless Backend (100% Grounded)'
+        };
+      }
+    }
+  } catch (err) {
+    console.warn("Method 0 (Vercel Serverless API) notice:", err);
+  }
+
+  // METHOD 1: Client-Side CORS Proxy via ytInitialPlayerResponse
   try {
     const videoPageUrl = `https://corsproxy.io/?${encodeURIComponent(`https://www.youtube.com/watch?v=${videoId}`)}`;
     const res = await fetch(videoPageUrl, { headers: { 'Accept-Language': 'en-US,en;q=0.9,hi;q=0.8' } });
@@ -164,7 +187,7 @@ export async function fetchYouTubeTranscript(videoId: string): Promise<VideoTran
                 fullTranscriptText,
                 totalDurationSeconds: Math.ceil(lastSeg.start + lastSeg.duration),
                 totalCharacterCount: fullTranscriptText.length,
-                methodUsed: 'YouTube CaptionTrack API (Primary)'
+                methodUsed: 'YouTube CaptionTrack API (Client Proxy)'
               };
             }
           }
@@ -208,7 +231,7 @@ export async function fetchYouTubeTranscript(videoId: string): Promise<VideoTran
                 fullTranscriptText,
                 totalDurationSeconds: Math.ceil(lastSeg.start + lastSeg.duration),
                 totalCharacterCount: fullTranscriptText.length,
-                methodUsed: 'YouTube CaptionTrack API (Secondary)'
+                methodUsed: 'YouTube CaptionTrack API (Secondary Proxy)'
               };
             }
           }
@@ -219,39 +242,6 @@ export async function fetchYouTubeTranscript(videoId: string): Promise<VideoTran
     console.warn("Method 2 (allorigins) failed:", err);
   }
 
-  // METHOD 3: Fallback Public Transcript API Endpoint
-  try {
-    const apiUrl = `https://yt.lemnoslife.com/noKey/captions?v=${videoId}`;
-    const res = await fetch(apiUrl);
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.subtitles && data.subtitles.length > 0) {
-        const subTrack = data.subtitles[0];
-        const segments: TranscriptSegment[] = subTrack.text.map((item: any) => ({
-          start: item.start,
-          duration: item.duration,
-          text: item.utf8 || item.text,
-          timestamp: formatSecondsToTimestamp(item.start)
-        }));
-        
-        const fullTranscriptText = segments.map((s) => `[${s.timestamp}] ${s.text}`).join('\n');
-        const lastSeg = segments[segments.length - 1];
-        return {
-          videoId,
-          success: true,
-          language: subTrack.languageCode || 'en',
-          segments,
-          fullTranscriptText,
-          totalDurationSeconds: Math.ceil(lastSeg ? lastSeg.start + lastSeg.duration : 0),
-          totalCharacterCount: fullTranscriptText.length,
-          methodUsed: 'LemnosLife Captions API'
-        };
-      }
-    }
-  } catch (err) {
-    console.warn("Method 3 (lemnoslife) failed:", err);
-  }
-
   // If all automated transcript methods fail
   return {
     videoId,
@@ -260,7 +250,7 @@ export async function fetchYouTubeTranscript(videoId: string): Promise<VideoTran
     fullTranscriptText: '',
     totalDurationSeconds: 0,
     totalCharacterCount: 0,
-    warning: 'Transcript could not be retrieved automatically. Please paste transcript text in the "Review Transcript" drawer for 100% video fidelity.',
+    warning: 'Transcript could not be retrieved automatically. Please paste transcript text in the "Paste Video Transcript" drawer for 100% video fidelity.',
     methodUsed: 'Failed'
   };
 }
