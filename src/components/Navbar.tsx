@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { PanelLeft, Sparkles, ChevronDown, Check, HelpCircle, Calendar, ExternalLink } from 'lucide-react';
+import { PanelLeft, Sparkles, ChevronDown, Check, HelpCircle, Calendar, ExternalLink, FileText } from 'lucide-react';
 import { ApiCostSummary } from '../types/cost';
 
 interface NavbarProps {
@@ -21,6 +21,7 @@ interface NavbarProps {
   onOpenSettings?: () => void;
   apiCostSummary?: ApiCostSummary;
   onOpenCostDashboard?: () => void;
+  onOpenYtToText?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -31,7 +32,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onSelectModel,
   onOpenSettings,
   apiCostSummary,
-  onOpenCostDashboard
+  onOpenCostDashboard,
+  onOpenYtToText
 }) => {
   const [isModelDropdownOpen, setIsModelDropdownOpen] = useState(false);
   const [isCreditsPopupOpen, setIsCreditsPopupOpen] = useState(false);
@@ -131,10 +133,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               border: 'none',
               fontSize: 14,
               fontWeight: 600,
-              color: '#09090b',
               display: 'flex',
               alignItems: 'center',
               gap: 6,
+              color: '#09090b',
               cursor: 'pointer',
               transition: 'background 0.15s ease'
             }}
@@ -209,6 +211,30 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           )}
         </div>
+
+        {/* YT to Text Dedicated Page Pill */}
+        {onOpenYtToText && (
+          <button
+            onClick={onOpenYtToText}
+            style={{
+              padding: '6px 12px',
+              borderRadius: 8,
+              background: '#eff6ff',
+              border: '1px solid #dbeafe',
+              color: '#2563eb',
+              fontSize: 13,
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              cursor: 'pointer',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <FileText style={{ width: 14, height: 14, color: '#2563eb' }} />
+            <span>📜 YT to Text</span>
+          </button>
+        )}
       </div>
 
       {/* Center: Manus Free plan | Upgrade Pill */}

@@ -9,6 +9,7 @@ import { ChatWithVideoDrawer } from './components/ChatWithVideoDrawer';
 import { PlaylistInputModal } from './components/PlaylistInputModal';
 import { ApiCostDashboardModal } from './components/ApiCostDashboardModal';
 import { SettingsModal } from './components/SettingsModal';
+import { YtToTextPage } from './components/YtToTextPage';
 
 import { VideoNoteAnalysis, ChatSession, MasterChatMessage } from './types/notes';
 import { ApiCostSummary, ApiUsageLog } from './types/cost';
@@ -26,6 +27,13 @@ export const App: React.FC = () => {
   const [defaultQuizQty, setDefaultQuizQty] = useState<number>(() => {
     const saved = localStorage.getItem('mindtube_default_quiz_qty');
     return saved ? parseInt(saved, 10) : 10;
+  });
+
+  const [currentView, setCurrentView] = useState<'notes' | 'yttotext'>(() => {
+    if (typeof window !== 'undefined' && (window.location.pathname.includes('/yttotext') || window.location.search.includes('view=yttotext'))) {
+      return 'yttotext';
+    }
+    return 'notes';
   });
 
   // Responsive desktop detection
@@ -417,6 +425,18 @@ export const App: React.FC = () => {
     }
   };
 
+  if (currentView === 'yttotext') {
+    return (
+      <YtToTextPage
+        onBackToApp={() => setCurrentView('notes')}
+        onSendTranscriptToNotes={(transcriptText, targetUrl) => {
+          setCurrentView('notes');
+          handleSendMessage(targetUrl, transcriptText);
+        }}
+      />
+    );
+  }
+
   return (
     <div style={{ display: 'flex', width: '100vw', minHeight: '100vh', background: '#ffffff', overflowX: 'hidden' }}>
       {/* ChatGPT Left Docked Sidebar on Desktop / Slide-out on Mobile */}
@@ -461,6 +481,7 @@ export const App: React.FC = () => {
           onOpenSettings={() => setIsSettingsModalOpen(true)}
           apiCostSummary={apiCostSummary}
           onOpenCostDashboard={() => setIsCostDashboardOpen(true)}
+          onOpenYtToText={() => setCurrentView('yttotext')}
         />
 
         {/* Main Content Workspace Container */}
