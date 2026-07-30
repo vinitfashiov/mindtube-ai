@@ -18,6 +18,23 @@ export interface VideoTranscriptResult {
   methodUsed?: string;
 }
 
+// Fetch with hard 3.5-second timeout so UI never freezes or gets stuck
+async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs = 3500): Promise<Response> {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+    clearTimeout(id);
+    return response;
+  } catch (err) {
+    clearTimeout(id);
+    throw err;
+  }
+}
+
 // Format seconds into MM:SS or HH:MM:SS string
 export function formatSecondsToTimestamp(seconds: number): string {
   const h = Math.floor(seconds / 3600);
@@ -128,10 +145,11 @@ export async function fetchYouTubeTranscript(videoId: string): Promise<VideoTran
     };
   }
 
-  // METHOD 0: Direct Vercel Serverless Backend API Route (Zero CORS, 1-Click Automatic!)
+  // METHOD 0: Direct Vercel Serverless Backend API Route (Zero CORS, 3.5s Timeout)
   try {
-    const apiUrl = `/api/transcript?v=${encodeURIComponent(videoId)}`;
-    const res = await fetch(apiUrl);
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const apiUrl = `${origin}/api/transcript?v=${encodeURIComponent(videoId)}`;
+    const res = await fetchWithTimeout(apiUrl, {}, 3500);
     if (res.ok) {
       const data = await res.json();
       if (data && data.success && data.fullTranscriptText) {
@@ -148,13 +166,13 @@ export async function fetchYouTubeTranscript(videoId: string): Promise<VideoTran
       }
     }
   } catch (err) {
-    console.warn("Method 0 (Vercel Serverless API) notice:", err);
+    console.warn("Method 0 (Serverless API timeout/notice):", err);
   }
 
-  // METHOD 1: Client-Side CORS Proxy via ytInitialPlayerResponse
+  // METHOD 1: Client-Side CORS Proxy via ytInitialPlayerResponse (3.5s Timeout)
   try {
     const videoPageUrl = `https://corsproxy.io/?${encodeURIComponent(`https://www.youtube.com/watch?v=${videoId}`)}`;
-    const res = await fetch(videoPageUrl, { headers: { 'Accept-Language': 'en-US,en;q=0.9,hi;q=0.8' } });
+    const res = await fetchWithTimeout(videoPageUrl, { headers: { 'Accept-Language': 'en-US,en;q=0.9,hi;q=0.8' } }, 3500);
     
     if (res.ok) {
       const html = await res.text();
@@ -170,7 +188,7 @@ export async function fetchYouTubeTranscript(videoId: string): Promise<VideoTran
                         tracks[0];
           
           const captionUrl = `https://corsproxy.io/?${encodeURIComponent(track.baseUrl)}`;
-          const captionRes = await fetch(captionUrl);
+          const captionRes = await fetchWithTimeout(captionUrl, {}, 3500);
           
           if (captionRes.ok) {
             const xmlText = await captionRes.text();
@@ -195,13 +213,13 @@ export async function fetchYouTubeTranscript(videoId: string): Promise<VideoTran
       }
     }
   } catch (err) {
-    console.warn("Method 1 (corsproxy) failed:", err);
+    console.warn("Method 1 (corsproxy timeout/notice):", err);
   }
 
-  // METHOD 2: Secondary Proxy (AllOrigins)
+  // METHOD 2: Secondary Proxy (AllOrigins) (3.5s Timeout)
   try {
     const videoPageUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://www.youtube.com/watch?v=${videoId}`)}`;
-    const res = await fetch(videoPageUrl);
+    const res = await fetchWithTimeout(videoPageUrl, {}, 3500);
     
     if (res.ok) {
       const html = await res.text();
@@ -214,7 +232,7 @@ export async function fetchYouTubeTranscript(videoId: string): Promise<VideoTran
         if (tracks && tracks.length > 0) {
           const track = tracks[0];
           const captionUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(track.baseUrl)}`;
-          const captionRes = await fetch(captionUrl);
+          const captionRes = await fetchWithTimeout(captionUrl, {}, 3500);
           
           if (captionRes.ok) {
             const xmlText = await captionRes.text();
@@ -239,10 +257,10 @@ export async function fetchYouTubeTranscript(videoId: string): Promise<VideoTran
       }
     }
   } catch (err) {
-    console.warn("Method 2 (allorigins) failed:", err);
+    console.warn("Method 2 (allorigins timeout/notice):", err);
   }
 
-  // If all automated transcript methods fail
+  // If all automated transcript methods fail or time out
   return {
     videoId,
     success: false,
@@ -251,6 +269,6 @@ export async function fetchYouTubeTranscript(videoId: string): Promise<VideoTran
     totalDurationSeconds: 0,
     totalCharacterCount: 0,
     warning: 'Transcript could not be retrieved automatically. Please paste transcript text in the "Paste Video Transcript" drawer for 100% video fidelity.',
-    methodUsed: 'Failed'
+    methodUsed: 'Timed Out / Fallback'
   };
 }
