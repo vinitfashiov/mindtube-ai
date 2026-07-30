@@ -176,6 +176,53 @@ export async function fetchRapidApiTranscript(videoId: string, rapidApiKey: stri
     console.warn("RapidAPI Host 2 notice:", err);
   }
 
+  // RapidAPI Host 3: youtube-transcripts1.p.rapidapi.com (Supadata)
+  try {
+    const url = `https://youtube-transcripts1.p.rapidapi.com/transcript?url=${encodeURIComponent(`https://www.youtube.com/watch?v=${videoId}`)}`;
+    const res = await fetchWithTimeout(url, {
+      headers: {
+        'x-rapidapi-key': key,
+        'x-rapidapi-host': 'youtube-transcripts1.p.rapidapi.com'
+      }
+    }, 6000);
+
+    if (res.ok) {
+      const data = await res.json();
+      const rawArray = Array.isArray(data) ? data : (data.content || data.transcript || data.transcripts);
+
+      if (Array.isArray(rawArray) && rawArray.length > 0) {
+        const segments: TranscriptSegment[] = rawArray.map((item: any) => {
+          const start = typeof item.offset === 'number' ? Math.floor(item.offset / 1000) : (typeof item.start === 'number' ? item.start : parseFloat(item.start || '0'));
+          const duration = typeof item.duration === 'number' ? item.duration : 3;
+          const text = (item.text || item.content || '').replace(/<[^>]+>/g, '').trim();
+          return {
+            start,
+            duration,
+            text,
+            timestamp: formatSecondsToTimestamp(start)
+          };
+        }).filter((s) => s.text.length > 0);
+
+        if (segments.length > 0) {
+          const fullTranscriptText = segments.map((s) => `[${s.timestamp}] ${s.text}`).join('\n');
+          const lastSeg = segments[segments.length - 1];
+          return {
+            videoId,
+            success: true,
+            language: 'auto',
+            segments,
+            fullTranscriptText,
+            totalDurationSeconds: Math.ceil(lastSeg.start + lastSeg.duration),
+            totalCharacterCount: fullTranscriptText.length,
+            methodUsed: 'RapidAPI Supadata YouTube Transcripts'
+          };
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("RapidAPI Host 3 notice:", err);
+  }
+
   return null;
 }
 
